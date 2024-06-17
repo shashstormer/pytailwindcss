@@ -5,7 +5,7 @@ with open("readme.md", "r") as fh:
 
 setup(
     name='pytailwind',
-    version='0.0.1',
+    version='0.0.2',
     packages=['pytailwind'],
     url='https://github.com/shashstormer/pytailwindcss',
     license='MIT License',

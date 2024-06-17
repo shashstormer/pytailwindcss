@@ -337,12 +337,51 @@ class Tailwind:
             "accentColor": {
                 "auto": 'auto',
             },
-            "animation": {
+            "animationNames": {
                 "none": 'none',
-                "spin": 'spin 1s linear infinite',
-                "ping": 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
-                "pulse": 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                "bounce": 'bounce 1s infinite',
+                "spin": 'spin 1s linear var(--tw-animation-count, infinite)',
+                "ping": 'ping 1s cubic-bezier(0, 0, 0.2, 1) var(--tw-animation-count, infinite)',
+                "pulse": 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) var(--tw-animation-count, infinite)',
+                "bounce": 'bounce 1s var(--tw-animation-count, infinite)',
+            },
+            # "animationDuration": {
+            #     "seconds": "s",  # Duration in seconds
+            #     "milliseconds": "ms"  # Duration in milliseconds
+            # },
+            "animationTimingFunction": {
+                "ease": "ease",
+                "linear": "linear",
+                "easein": "ease-in",
+                "easeout": "ease-out",
+                "easeinout": "ease-in-out",
+                "stepstart": "step-start",
+                "stepend": "step-end",
+                # "steps": "steps(int, start|end)",  # Custom steps
+                # "cubicBezier": "cubic-bezier(n,n,n,n)"  # Custom cubic-bezier
+            },
+            # "animationDelay": {
+            #     "seconds": "s",  # Delay in seconds
+            #     "milliseconds": "ms"  # Delay in milliseconds
+            # },
+            "animationIterationCount": {
+                "infinite": "infinite",
+                # "number": "number"  # Specific number of iterations
+            },
+            "animationDirection": {
+                "normal": "normal",
+                "reverse": "reverse",
+                "alternate": "alternate",
+                "alternateReverse": "alternate-reverse"
+            },
+            "animationFillMode": {
+                "none": "none",
+                "forwards": "forwards",
+                "backwards": "backwards",
+                "both": "both"
+            },
+            "animationPlayState": {
+                "running": "running",
+                "paused": "paused"
             },
             "aria": {
                 "busy": 'busy="true"',
@@ -362,14 +401,18 @@ class Tailwind:
             },
             "backgroundImage": {
                 "none": 'none',
-                'gradient-to-t': 'linear-gradient(to top, var(--tw-gradient-stops))',
-                'gradient-to-tr': 'linear-gradient(to top right, var(--tw-gradient-stops))',
-                'gradient-to-r': 'linear-gradient(to right, var(--tw-gradient-stops))',
-                'gradient-to-br': 'linear-gradient(to bottom right, var(--tw-gradient-stops))',
-                'gradient-to-b': 'linear-gradient(to bottom, var(--tw-gradient-stops))',
-                'gradient-to-bl': 'linear-gradient(to bottom left, var(--tw-gradient-stops))',
-                'gradient-to-l': 'linear-gradient(to left, var(--tw-gradient-stops))',
-                'gradient-to-tl': 'linear-gradient(to top left, var(--tw-gradient-stops))',
+                "gradient": {
+                    "to": {
+                        "t": "linear-gradient(to top, var(--tw-gradient-stops))",
+                        "tr": "linear-gradient(to top right, var(--tw-gradient-stops))",
+                        "r": "linear-gradient(to right, var(--tw-gradient-stops))",
+                        "br": "linear-gradient(to bottom right, var(--tw-gradient-stops))",
+                        "b": "linear-gradient(to bottom, var(--tw-gradient-stops))",
+                        "bl": "linear-gradient(to bottom left, var(--tw-gradient-stops))",
+                        "l": "linear-gradient(to left, var(--tw-gradient-stops))",
+                        "tl": "linear-gradient(to top left, var(--tw-gradient-stops))"
+                    }
+                }
             },
             "backgroundPosition": {
                 "bottom": 'bottom',
@@ -399,7 +442,7 @@ class Tailwind:
                 '3xl': '64px',
             },
             "break": {
-                "normal": [{"word-break": "normal"}, {"overflow-wrap": "normal"}],
+                "normal": [{"word-break": "normal", "overflow-wrap": "normal"}],
                 "words": [{"overflow-wrap": "break-word"}],
                 "all": [{"word-break": "break-all"}],
                 "keep": [{"word-break": "keep-all"}],
@@ -421,6 +464,63 @@ class Tailwind:
                 "2": '2px',
                 "4": '4px',
                 "8": '8px',
+                "x": {
+                    "0": [{"border-left-width": "0px", "border-right-width": "0px"}],
+                    "2": [{"border-left-width": "2px", "border-right-width": "2px"}],
+                    "4": [{"border-left-width": "4px", "border-right-width": "4px"}],
+                    "8": [{"border-left-width": "8px", "border-right-width": "8px"}],
+                    "DEFAULT": [{"border-left-width": "1px", "border-right-width": "1px"}],
+                },
+                "y": {
+                    "0": [{"border-top-width": "0px", "border-bottom-width": "0px"}],
+                    "2": [{"border-top-width": "2px", "border-bottom-width": "2px"}],
+                    "4": [{"border-top-width": "4px", "border-bottom-width": "4px"}],
+                    "8": [{"border-top-width": "8px", "border-bottom-width": "8px"}],
+                    "DEFAULT": [{"border-top-width": "1px", "border-bottom-width": "1px"}]
+                },
+                "s": {
+                    "0": [{"border-inline-start-width": "0px"}],
+                    "2": [{"border-inline-start-width": "2px"}],
+                    "4": [{"border-inline-start-width": "4px"}],
+                    "8": [{"border-inline-start-width": "8px"}],
+                    "DEFAULT": [{"border-inline-start-width": "1px"}]
+                },
+                "e": {
+                    "0": [{"border-inline-end-width": "0px"}],
+                    "2": [{"border-inline-end-width": "2px"}],
+                    "4": [{"border-inline-end-width": "4px"}],
+                    "8": [{"border-inline-end-width": "8px"}],
+                    "DEFAULT": [{"border-inline-end-width": "1px"}]
+                },
+                "t": {
+                    "0": [{"border-top-width": "0px"}],
+                    "2": [{"border-top-width": "2px"}],
+                    "4": [{"border-top-width": "4px"}],
+                    "8": [{"border-top-width": "8px"}],
+                    "DEFAULT": [{"border-top-width": "1px"}]
+                },
+                "r": {
+                    "0": [{"border-right-width": "0px"}],
+                    "2": [{"border-right-width": "2px"}],
+                    "4": [{"border-right-width": "4px"}],
+                    "8": [{"border-right-width": "8px"}],
+                    "DEFAULT": [{"border-right-width": "1px"}]
+                },
+                "b": {
+                    "0": [{"border-bottom-width": "0px"}],
+                    "2": [{"border-bottom-width": "2px"}],
+                    "4": [{"border-bottom-width": "4px"}],
+                    "8": [{"border-bottom-width": "8px"}],
+                    "DEFAULT": [{"border-bottom-width": "1px"}]
+                },
+                "l": {
+                    "0": [{"border-left-width": "0px"}],
+                    "2": [{"border-left-width": "2px"}],
+                    "4": [{"border-left-width": "4px"}],
+                    "8": [{"border-left-width": "8px"}],
+                    "DEFAULT": [{"border-left-width": "1px"}]
+                }
+
             },
             "boxShadow": {
                 "sm": '0 1px 2px 0 rgb(0 0 0 / 0.05)',
@@ -490,6 +590,7 @@ class Tailwind:
             'cursor': {
                 'auto': 'auto',
                 'default': 'default',
+                'DEFAULT': 'default',
                 'pointer': 'pointer',
                 'wait': 'wait',
                 'text': 'text',
@@ -546,7 +647,8 @@ class Tailwind:
                 "inline-table": "inline-table",
                 "table-row": "table-row",
                 "table-cell": "table-cell",
-                "none": "none"
+                "none": "none",
+                "hidden": "none"
             },
             "fill": self.colors,
             "flex": {
@@ -629,6 +731,16 @@ class Tailwind:
                 '7xl': ['4.5rem', {"lineHeight": '1'}],
                 '8xl': ['6rem', {"lineHeight": '1'}],
                 '9xl': ['8rem', {"lineHeight": '1'}],
+            },
+            "fontSmoothing": {
+                "antialiased": {
+                    "-webkit-font-smoothing": "antialiased",
+                    "-moz-osx-font-smoothing": "grayscale"
+                },
+                "subpixel-antialiased": {
+                    "-webkit-font-smoothing": "auto",
+                    "-moz-osx-font-smoothing": "auto"
+                }
             },
             "fontStyle": {
                 "italic": "italic",
@@ -1147,6 +1259,10 @@ class Tailwind:
                 "xl": '1280px',
                 '2xl': '1536px',
             },
+            "scroll": {
+                "auto": "auto",
+                "smooth": "smooth",
+            },
             "sepia": {
                 "0": '0',
                 "DEFAULT": '100%',
@@ -1196,6 +1312,19 @@ class Tailwind:
                 "80": '20rem',
                 "96": '24rem',
             },
+            "srOnly": {
+                "DEFAULT": {
+                    "position": "absolute",
+                    "width": "1px",
+                    "height": "1px",
+                    "padding": "0",
+                    "margin": "-1px",
+                    "overflow": "hidden",
+                    "clip": "rect(0, 0, 0, 0)",
+                    "white-space": "nowrap",
+                    "border-width": "0"
+                },
+            },
             "stroke": {
                 "none": 'none',
             },
@@ -1206,6 +1335,14 @@ class Tailwind:
             },
             "supports": {},
             "data": {},
+            "textAlign": {
+                "left": "left",  # Align text to the left
+                "right": "right",  # Align text to the right
+                "center": "center",  # Center-align text
+                "justify": "justify",  # Justify text
+                "initial": "initial",  # Sets the text-align property to its DEFAULT value
+                "inherit": "inherit"  # Inherits the text-align property from its parent element
+            },
             "textDecorationThickness": {
                 "auto": 'auto',
                 'from-font': 'from-font',
@@ -1277,14 +1414,35 @@ class Tailwind:
                 "1000": '1000ms',
             },
             "transitionProperty": {
-                "none": 'none',
-                "all": 'all',
-                "DEFAULT":
-                    'color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter',
-                "colors": 'color, background-color, border-color, text-decoration-color, fill, stroke',
-                "opacity": 'opacity',
-                "shadow": 'box-shadow',
-                "transform": 'transform',
+                "none": [{"transition-property": "none"}],
+                "all": [{"transition-property": "all"}],
+                "timingFunction": [{"transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)"}],
+                "duration": [{"transition-duration": "150ms"}],
+                "transition": [{
+                    "transition-property": "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
+                    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+                    "transition-duration": "150ms"
+                }],
+                "colors": [{
+                    "transition-property": "color, background-color, border-color, text-decoration-color, fill, stroke",
+                    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+                    "transition-duration": "150ms"
+                }],
+                "opacity": [{
+                    "transition-property": "opacity",
+                    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+                    "transition-duration": "150ms"
+                }],
+                "shadow": [{
+                    "transition-property": "box-shadow",
+                    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+                    "transition-duration": "150ms"
+                }],
+                "transform": [{
+                    "transition-property": "transform",
+                    "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+                    "transition-duration": "150ms"
+                }],
             },
             "transitionTimingFunction": {
                 "DEFAULT": 'cubic-bezier(0.4, 0, 0.2, 1)',
@@ -1446,6 +1604,44 @@ class Tailwind:
             self.classes[c1].update(self.classes[c2])
         for c1, c2 in self.copy_classes:
             self.classes[c1] = self.classes[c2]
+        self.classes["from"] = {}
+        self.classes["to"] = {}
+        self.classes["via"] = {}
+        self.classes["fromPosition"] = self.classes["toPosition"] = self.classes["viaPosition"] = {}
+        for color in self.colors:
+            val = self.colors[color]
+            if isinstance(val, str):
+                self.classes["from"][
+                    color] = f"""--tw-gradient-from: {val} var(--tw-gradient-from-position);--tw-gradient-to: {val + "00" if val.startswith('#') else val} var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);"""
+                self.classes["via"][
+                    color] = f"""--tw-gradient-to: {val + "00" if val.startswith('#') else val}  var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), {val} var(--tw-gradient-via-position), var(--tw-gradient-to);"""
+                self.classes["to"][color] = f"""--tw-gradient-to: {val} var(--tw-gradient-to-position);"""
+                continue
+            clr_nos = val
+            for clr_no in clr_nos:
+                val = self.colors[color][clr_no]
+                if color not in self.classes['from']:
+                    self.classes["from"][color] = {}
+                    self.classes["to"][color] = {}
+                    self.classes["via"][color] = {}
+                self.classes["from"][color][
+                    clr_no] = f"""--tw-gradient-from: {val} var(--tw-gradient-from-position);--tw-gradient-to: {val + "00" if val.startswith('#') else val} var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);"""
+                self.classes["via"][color][
+                    clr_no] = f"""--tw-gradient-to: {val + "00" if val.startswith('#') else val}  var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), {val} var(--tw-gradient-via-position), var(--tw-gradient-to);"""
+                self.classes["to"][color][clr_no] = f"""--tw-gradient-to: {val} var(--tw-gradient-to-position);"""
+        self.classes["fromPosition"] = {}
+        self.classes["viaPosition"] = {}
+        self.classes["toPosition"] = {}
+        for i in range(0, 101, 5):
+            # --tw-gradient-from-position
+            # --tw-gradient-via-position
+            # --tw-gradient-to-position
+            self.classes["fromPosition"][str(i)] = f"{i}%"
+            self.classes["fromPosition"][str(i) + "%"] = f"{i}%"
+            self.classes["viaPosition"][str(i)] = f"{i}%"
+            self.classes["viaPosition"][str(i) + "%"] = f"{i}%"
+            self.classes["toPosition"][str(i)] = f"{i}%"
+            self.classes["toPosition"][str(i) + "%"] = f"{i}%"
         self.dynamic_value = {
             "text": "color",
             "w": "width",
@@ -1505,10 +1701,6 @@ class Tailwind:
             "roundedBottomRight": ["borderBottomRightRadius"],
             "roundedBottomLeft": ["borderBottomLeftRadius"],
             "border": ["borderWidth"],
-            "borderTop": ["borderTopWidth"],
-            "borderRight": ["borderRightWidth"],
-            "borderBottom": ["borderBottomWidth"],
-            "borderLeft": ["borderLeftWidth"],
             "itemsCenter": ["alignItems"],
             "justifyCenter": ["justifyContent"],
             "contentCenter": ["alignContent"],
@@ -1528,6 +1720,13 @@ class Tailwind:
 
         self.to_css_name = {
             "animation": "animation",
+            "animationDuration": "animation-duration",
+            "animationTimingFunction": "animation-timing-function",
+            "animationDelay": "animation-delay",
+            "animationIterationCount": "animation-iteration-count",
+            "animationDirection": "animation-direction",
+            "animationFillMode": "animation-fill-mode",
+            "animationPlayState": "animation-play-state",
             "aria": "aria",
             "aspectRatio": "aspect-ratio",
             "backgroundImage": "background-image",
@@ -1554,6 +1753,7 @@ class Tailwind:
             "fontSize": "font-size",
             "fontWeight": "font-weight",
             "fontStyle": "font-style",
+            "fromPosition": "--tw-gradient-from-position",
             "gradientColorStopPositions": "gradient-color-stop-positions",
             "grayscale": "grayscale",
             "gridAutoColumns": "grid-auto-columns",
@@ -1593,8 +1793,10 @@ class Tailwind:
             "order": "order",
             "outlineOffset": "outline-offset",
             "outlineWidth": "outline-width",
+            "paddingTop": "padding-top",
             "paddingBottom": "padding-bottom",
             "paddingRight": "padding-right",
+            "paddingLeft": "padding-left",
             "ringColor": "ring-color",
             "ringOffsetWidth": "ring-offset-width",
             "ringOpacity": "ring-opacity",
@@ -1610,6 +1812,9 @@ class Tailwind:
             "strokeWidth": "stroke-width",
             "supports": "supports",
             "data": "data",
+            "toPosition": "--tw-gradient-to-position",
+            "to": "--tw-gradient-to",
+            "textAlign": "text-align",
             "textDecorationThickness": "text-decoration-thickness",
             "textUnderlineOffset": "text-underline-offset",
             "textTransform": "text-transform",
@@ -1621,6 +1826,7 @@ class Tailwind:
             "transitionTimingFunction": "transition-timing-function",
             "translate": "translate",
             "size": "size",
+            "viaPosition": "--tw-gradient-via-position",
             "width": "width",
             "willChange": "will-change",
             "zIndex": "z-index",
@@ -1662,7 +1868,12 @@ class Tailwind:
             "textDecoration": "text-decoration",
         }
         self.to_tailwind_name = {
-            "animation": "animate",
+            "animationNames": "animate",
+            "animationTimingFunction": ["animate", "animation-timing-function"],
+            "animationIterationCount": ["animate", "animation-direction"],
+            "animationDirection": ["animate", "animation-direction"],
+            "animationFillMode": ["animate", "animation-fill"],
+            "animationPlayState": ["animate", "animation-play-state"],
             "aria": "aria",
             "aspectRatio": "aspect",
             "backgroundImage": "bg",
@@ -1692,13 +1903,17 @@ class Tailwind:
                 "inline-table",
                 "table-row",
                 "table-cell",
-                "none"
+                "none",
+                "hidden"
             ],
+            "from": "from",
+            "fromPosition": "from",
             "fill": "fill",
             "flex": "flex",
             "flexBasis": "basis",
             "flexGrow": "grow",
             "flexShrink": "shrink",
+            "fontSmoothing": ["antialiased", "subpixel-antialiased"],
             "fontFamily": "font",
             "fontSize": "text",
             "fontWeight": "font",
@@ -1762,10 +1977,14 @@ class Tailwind:
             "screens": "screens",
             "sepia": "sepia",
             "skew": "skew",
+            "srOnly": "sr-only",
             "stroke": "stroke",
             "strokeWidth": "stroke",
             "supports": "supports",
             "data": "data",
+            "to": "to",
+            "toPosition": "to",
+            "textAlign": "text",
             "textDecorationThickness": "decoration",
             "textUnderlineOffset": "underline-offset",
             "textTransform": [
@@ -1781,6 +2000,8 @@ class Tailwind:
             "transitionProperty": "transition",
             "transitionTimingFunction": "ease",
             "translate": "translate",
+            "via": "via",
+            "viaPosition": "via",
             "size": "size",
             "width": "w",
             "willChange": "will-change",
@@ -1870,13 +2091,26 @@ class Tailwind:
         match_classes = re.compile('class\s*=\s*["\']([^"\']+)["\']')
         classes = match_classes.findall(page_content)
         classes_list = []
-        result_css = ""
+        result_css = {}
         for i in classes:
             i = i.split(" ")
             for j in i:
                 if j not in classes_list:
                     classes_list.append(j)
         for i in classes_list:
+            ori_i = i
+            opacity = i.split("/", 1)
+            opacity_text = ""
+            if len(opacity) == 2:
+                try:
+                    ori_op = opacity
+                    opacity = int(opacity[-1])
+                    i = ori_op[0]
+                    opacity_text = f"/{opacity}"
+                except Exception as e:
+                    opacity = 100
+            else:
+                opacity = 100
             j = i.split("-")
             processors = []
             if ":" in j[0]:
@@ -1889,49 +2123,100 @@ class Tailwind:
                 j = [j2]
                 j.extend(j3)
                 gps = self._tailwind_gps_matched(j[0])
-                res = ""
-                gp_res = ""
                 for gp in gps:
+                    res = ""
+                    gp_res = ""
                     if len(j) == 1:
-                        if gp == j[0]:
+                        res = self.classes[gp].get(j[0], "")
+                        if not res:
                             res = self.classes[gp].get("DEFAULT", "")
-                        else:
-                            res = self.classes[gp].get(j[0], "")
                         if res:
                             gp_res = gp
                     if len(j) == 2:
                         res = self.classes[gp].get(j[1], "")
-                        if j[1].startswith("["):
+                        if isinstance(res, dict):
+                            res = res.get("DEFAULT", "")
+                        if j[-1].startswith("["):
                             gp_res = self.dynamic_value.get(j[0], "")
                             if gp_res:
-                                res = j[1].replace("[", "").replace("]", "")
+                                res = j[-1].replace("[", "").replace("]", "")
                                 if gp_res in self.multi_requirement:
                                     res = [res]
                                     for z in self.multi_requirement[gp_res]:
                                         res.append({z: res[0]})
-                        if isinstance(res, dict):
-                            res = res.get("DEFAULT", "")
+                            else:
+                                if not res:
+                                    res = j[-1].replace("[", "").replace("]", "")
                         if res:
                             gp_res = gp
                     if len(j) == 3:
                         res = self.classes[gp].get(j[1], {}).get(j[2], "")
+                        if j[-1].startswith("["):
+                            if not res:
+                                res = j[-1].replace("[", "").replace("]", "")
+                        if res:
+                            gp_res = gp
+                    if len(j) == 4:
+                        res = self.classes[gp].get(j[1], {}).get(j[2], {}).get(j[3], "")
+                        if j[-1].startswith("["):
+                            if not res:
+                                res = j[-1].replace("[", "").replace("]", "")
                         if res:
                             gp_res = gp
                     if res:
-                        if isinstance(res, str) or isinstance(res[0], str):
+                        if (isinstance(res, str) or (isinstance(res, list) and isinstance(res[0], str))) and gp not in [
+                            "from", "to", "via"]:
                             result_css_to_add = (".%s {%s: %s;}" %
                                                  (
-                                                     self.sanitize_class_name(i),
+                                                     self.sanitize_class_name(ori_i),
                                                      self.to_css_name.get(gp_res, gp_res),
                                                      self.normalize_property_value(res)
                                                  )
                                                  )
                         else:
                             result_css_to_add = ".%s {%s}" % (
-                                self.sanitize_class_name(i), self.normalize_property_value(res))
+                                self.sanitize_class_name(ori_i), self.normalize_property_value(res))
                         result_css_to_add = self.process_result_value(result_css_to_add, processors)
-                        result_css += result_css_to_add
-        return result_css
+                        if opacity < 100:
+                            result_css_to_add = self.process_opacity(result_css_to_add, opacity)
+                        result_css[self.sanitize_class_name(ori_i)] = result_css_to_add
+        from_vals = [result_css[k] for k in result_css if "from-" in k]
+        via_vals = [result_css[k] for k in result_css if "via-" in k]
+        to_vals = [result_css[k] for k in result_css if "to-" in k]
+        vals = []
+        for key in list(result_css.keys()):
+            if "from-" in key or "via-" in key or "to-" in key:
+                del result_css[key]
+                continue
+            vals.append(result_css[key])
+            del result_css[key]
+        vals = vals + from_vals + via_vals + to_vals
+        return "".join(vals)
+
+    def process_opacity(self, css_class, opacity):
+        hex_regex = re.compile(r"[ '\"]#[0-9a-fA-F]{6,8}")
+        hexes = hex_regex.findall(css_class)
+        hexes = sorted(hexes, key=len, reverse=True)
+        for _hex in hexes:
+            char1 = _hex[0]
+            rgba = self.hex_to_rgb(_hex[1:])
+            if rgba[3] == 1:
+                rgba[3] = opacity / 100
+            rgba = f"rgba({', '.join([str(i) for i in rgba])})"
+            css_class = css_class.replace(_hex, char1 + rgba)
+        return css_class
+
+    @staticmethod
+    def hex_to_rgb(hex_color):
+        hex_color = hex_color.lstrip('#')
+        r = int(hex_color[0:2], 16)
+        g = int(hex_color[2:4], 16)
+        b = int(hex_color[4:6], 16)
+        if len(hex_color) == 8:
+            a = int(hex_color[6:8], 16) / 255.0
+        else:
+            a = 1.0
+        return [r, g, b, a]
 
     @staticmethod
     def process_result_value(result, processors):
@@ -1947,6 +2232,11 @@ class Tailwind:
             "dark",  # prefers-color-scheme: dark
             "motion-safe",  # prefers-reduced-motion: no-preference
             "motion-reduce"  # prefers-reduced-motion: reduce
+            "max-sm",
+            "max-md",
+            "max-lg",
+            "max-xl",
+            "max-2xl",
         ]
 
         # List of Pseudo-class Processors
@@ -2132,11 +2422,18 @@ class Tailwind:
                 fin = ".peer:placeholder-shown ~ " + result[0] + " {" + result[1]
             elif processor in ["sm", "md", "lg", "xl", "2xl"]:
                 media_queries = {
+                    "xs": "(min-width: 425px)",
                     "sm": "(min-width: 640px)",
                     "md": "(min-width: 768px)",
                     "lg": "(min-width: 1024px)",
                     "xl": "(min-width: 1280px)",
-                    "2xl": "(min-width: 1536px)"
+                    "2xl": "(min-width: 1536px)",
+                    "max-xs": "(max-width: 425px)",
+                    "max-sm": "(max-width: 640px)",
+                    "max-md": "(max-width: 768px)",
+                    "max-lg": "(max-width: 1024px)",
+                    "max-xl": "(max-width: 1280px)",
+                    "max-2xl": "(max-width: 1536px)",
                 }
                 fin = "@media %s {%s}" % (media_queries[processor], result)
             elif processor == "motion-safe":
@@ -2152,11 +2449,15 @@ class Tailwind:
                 result = fin
         if not fin and not processors:
             return result
-        return fin
+        return fin.replace(";;", ";")
 
     @staticmethod
     def sanitize_class_name(name):
-        return name.replace("[", "\\[").replace("]", "\\]").replace("%", "\\%").replace(":", "\\:").replace("/", "\\/")
+        name = (name.replace("[", "\\[").replace("]", "\\]").replace("%", "\\%").replace(":", "\\:")
+                .replace("/", "\\/").replace("(", "\\(").replace(")", "\\)").replace("#", "\\#").replace(",", "\\,"))
+        if name.startswith("space-x") or name.startswith("space-y"):
+            name += " > * + *"
+        return name
 
     def normalize_property_value(self, value):
         result = ""
@@ -2166,12 +2467,18 @@ class Tailwind:
                     result += value[0] + ";"
                     for key in value[1]:
                         result += self.to_css_name.get(key, key) + ":" + value[1][key] + ";"
+            elif isinstance(value[0], dict):
+                for key in value[0]:
+                    result += self.to_css_name.get(key, key) + ":" + value[0][key] + ";"
             else:
                 for i in value:
                     if not isinstance(i, str):
                         break
                 else:
                     result = ", ".join(value)
+        elif isinstance(value, dict):
+            for key, val in value.items():
+                result += f"{key}:{val};"
         else:
             result = value
         return result

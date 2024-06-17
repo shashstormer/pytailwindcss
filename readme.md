@@ -42,3 +42,14 @@ print(tailwind_css_for_page)
 with open("page.css", "wt") as f:
     f.write(tailwind_css_for_page)
 ```
+
+# Features
+
+* Supports most [tailwind classes](https://tailwindcss.com/)
+* Supports Hover, Focus, and Other States refer [tailwind guidelines](https://tailwindcss.com/docs/hover-focus-and-other-states).
+* Most of existing tailwind classes can always be parsed using this library (some clases may be missed out please contact shashstormer or make a PR to this repo).
+
+# Features to implement
+1. Config and extension of the default classes with .py config file.
+2. Watch files and generate css file.
+3. Add support for human-readable output and minified output (through config or/and CLI Options).
