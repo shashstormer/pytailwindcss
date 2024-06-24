@@ -399,6 +399,83 @@ class Tailwind:
                 "square": '1 / 1',
                 "video": '16 / 9',
             },
+            "backdrop-filter": {
+                "blur": {
+                    "sm": "blur(4px)",
+                    "DEFAULT": "blur(8px)",
+                    "md": "blur(12px)",
+                    "lg": "blur(16px)",
+                    "xl": "blur(24px)",
+                    "2xl": "blur(40px)",
+                    "3xl": "blur(64px)"
+                },
+                "brightness": {
+                    "0": "brightness(0)",
+                    "50": "brightness(.5)",
+                    "75": "brightness(.75)",
+                    "90": "brightness(.9)",
+                    "95": "brightness(.95)",
+                    "100": "brightness(1)",
+                    "105": "brightness(1.05)",
+                    "110": "brightness(1.1)",
+                    "125": "brightness(1.25)",
+                    "150": "brightness(1.5)",
+                    "200": "brightness(2)"
+                },
+                "contrast": {
+                    "0": "contrast(0)",
+                    "50": "contrast(.5)",
+                    "75": "contrast(.75)",
+                    "100": "contrast(1)",
+                    "125": "contrast(1.25)",
+                    "150": "contrast(1.5)",
+                    "200": "contrast(2)"
+                },
+                "grayscale": {
+                    "0": "grayscale(0)",
+                    "DEFAULT": "grayscale(1)"
+                },
+                "hue-rotate": {
+                    "0": "hue-rotate(0deg)",
+                    "15": "hue-rotate(15deg)",
+                    "30": "hue-rotate(30deg)",
+                    "60": "hue-rotate(60deg)",
+                    "90": "hue-rotate(90deg)",
+                    "180": "hue-rotate(180deg)"
+                },
+                "invert": {
+                    "0": "invert(0)",
+                    "DEFAULT": "invert(1)"
+                },
+                "opacity": {
+                    "0": "opacity(0)",
+                    "5": "opacity(.05)",
+                    "10": "opacity(.1)",
+                    "20": "opacity(.2)",
+                    "25": "opacity(.25)",
+                    "30": "opacity(.3)",
+                    "40": "opacity(.4)",
+                    "50": "opacity(.5)",
+                    "60": "opacity(.6)",
+                    "70": "opacity(.7)",
+                    "75": "opacity(.75)",
+                    "80": "opacity(.8)",
+                    "90": "opacity(.9)",
+                    "95": "opacity(.95)",
+                    "100": "opacity(1)"
+                },
+                "saturate": {
+                    "0": "saturate(0)",
+                    "50": "saturate(.5)",
+                    "100": "saturate(1)",
+                    "150": "saturate(1.5)",
+                    "200": "saturate(2)"
+                },
+                "sepia": {
+                    "0": "sepia(0)",
+                    "DEFAULT": "sepia(1)"
+                }
+            },
             "backgroundImage": {
                 "none": 'none',
                 "gradient": {
@@ -429,17 +506,6 @@ class Tailwind:
                 "auto": 'auto',
                 "cover": 'cover',
                 "contain": 'contain',
-            },
-            "blur": {
-                "0": '0',
-                "none": '0',
-                "sm": '4px',
-                "DEFAULT": '8px',
-                "md": '12px',
-                "lg": '16px',
-                "xl": '24px',
-                '2xl': '40px',
-                '3xl': '64px',
             },
             "break": {
                 "normal": [{"word-break": "normal", "overflow-wrap": "normal"}],
@@ -651,6 +717,75 @@ class Tailwind:
                 "hidden": "none"
             },
             "fill": self.colors,
+            "filter": {
+                "blur": {
+                    "sm": "blur(4px)",
+                    "DEFAULT": "blur(8px)",
+                    "md": "blur(12px)",
+                    "lg": "blur(16px)",
+                    "xl": "blur(24px)",
+                    "2xl": "blur(40px)",
+                    "3xl": "blur(64px)"
+                },
+                "brightness": {
+                    "0": "brightness(0)",
+                    "50": "brightness(.5)",
+                    "75": "brightness(.75)",
+                    "90": "brightness(.9)",
+                    "95": "brightness(.95)",
+                    "100": "brightness(1)",
+                    "105": "brightness(1.05)",
+                    "110": "brightness(1.1)",
+                    "125": "brightness(1.25)",
+                    "150": "brightness(1.5)",
+                    "200": "brightness(2)"
+                },
+                "contrast": {
+                    "0": "contrast(0)",
+                    "50": "contrast(.5)",
+                    "75": "contrast(.75)",
+                    "100": "contrast(1)",
+                    "125": "contrast(1.25)",
+                    "150": "contrast(1.5)",
+                    "200": "contrast(2)"
+                },
+                "drop-shadow": {
+                    "sm": "drop-shadow(0 1px 1px rgba(0,0,0,0.05))",
+                    "DEFAULT": "drop-shadow(0 1px 2px rgba(0,0,0,0.1))",
+                    "md": "drop-shadow(0 4px 3px rgba(0,0,0,0.07))",
+                    "lg": "drop-shadow(0 10px 8px rgba(0,0,0,0.04))",
+                    "xl": "drop-shadow(0 20px 13px rgba(0,0,0,0.03))",
+                    "2xl": "drop-shadow(0 25px 25px rgba(0,0,0,0.15))",
+                    "none": "drop-shadow(0 0 #0000)"
+                },
+                "grayscale": {
+                    "0": "grayscale(0)",
+                    "DEFAULT": "grayscale(1)"
+                },
+                "hue-rotate": {
+                    "0": "hue-rotate(0deg)",
+                    "15": "hue-rotate(15deg)",
+                    "30": "hue-rotate(30deg)",
+                    "60": "hue-rotate(60deg)",
+                    "90": "hue-rotate(90deg)",
+                    "180": "hue-rotate(180deg)"
+                },
+                "invert": {
+                    "0": "invert(0)",
+                    "DEFAULT": "invert(1)"
+                },
+                "saturate": {
+                    "0": "saturate(0)",
+                    "50": "saturate(.5)",
+                    "100": "saturate(1)",
+                    "150": "saturate(1.5)",
+                    "200": "saturate(2)"
+                },
+                "sepia": {
+                    "0": "sepia(0)",
+                    "DEFAULT": "sepia(1)"
+                }
+            },
             "flex": {
                 "1": '1 1 0%',
                 "auto": '1 1 auto',
@@ -1547,15 +1682,6 @@ class Tailwind:
             },
         }
         self.copy_classes = [
-            ["backdropBlur", 'blur'],
-            ["backdropBrightness", "brightness"],
-            ["backdropContrast", "contrast"],
-            ["backdropGrayscale", "grayscale"],
-            ["backdropHueRotate", "hueRotate"],
-            ["backdropInvert", "invert"],
-            ["backdropOpacity", "opacity"],
-            ["backdropSaturate", "saturate"],
-            ["backdropSepia", "sepia"],
             ["backgroundColor", "colors"],
             ["backgroundOpacity", "opacity"],
             ["borderColor", "colors"],
@@ -1732,7 +1858,6 @@ class Tailwind:
             "backgroundImage": "background-image",
             "backgroundPosition": "background-position",
             "backgroundSize": "background-size",
-            "blur": "blur",
             "borderRadius": "border-radius",
             "borderWidth": "border-width",
             "boxShadow": "box-shadow",
@@ -1830,15 +1955,6 @@ class Tailwind:
             "width": "width",
             "willChange": "will-change",
             "zIndex": "z-index",
-            "backdropBlur": "backdrop-blur",
-            "backdropBrightness": "backdrop-brightness",
-            "backdropContrast": "backdrop-contrast",
-            "backdropGrayscale": "backdrop-grayscale",
-            "backdropHueRotate": "backdrop-hue-rotate",
-            "backdropInvert": "backdrop-invert",
-            "backdropOpacity": "backdrop-opacity",
-            "backdropSaturate": "backdrop-saturate",
-            "backdropSepia": "backdrop-sepia",
             "backgroundColor": "background-color",
             "backgroundOpacity": "background-opacity",
             "borderColor": "border-color",
@@ -1879,7 +1995,6 @@ class Tailwind:
             "backgroundImage": "bg",
             "backgroundPosition": "bg",
             "backgroundSize": "bg",
-            "blur": "blur",
             "borderRadius": "rounded",
             "borderWidth": "border",
             "boxShadow": "shadow",
@@ -1890,7 +2005,6 @@ class Tailwind:
             "content": "content",
             "contrast": "contrast",
             "cursor": "cursor",
-            "dropShadow": "drop-shadow",
             "display": [
                 "block",
                 "inline",
@@ -1914,6 +2028,18 @@ class Tailwind:
             "flexGrow": "grow",
             "flexShrink": "shrink",
             "fontSmoothing": ["antialiased", "subpixel-antialiased"],
+            "filter": [
+                "blur",
+                "brightness",
+                "contrast",
+                "drop-shadow",
+                "grayscale",
+                "hue-rotate",
+                "invert",
+                "saturate",
+                "sepia"
+            ],
+            "backdrop-filter": ["backdrop"],
             "fontFamily": "font",
             "fontSize": "text",
             "fontWeight": "font",
@@ -2006,15 +2132,7 @@ class Tailwind:
             "width": "w",
             "willChange": "will-change",
             "zIndex": "z",
-            "backdropBlur": "backdrop-blur",
-            "backdropBrightness": "backdrop-brightness",
-            "backdropContrast": "backdrop-contrast",
-            "backdropGrayscale": "backdrop-grayscale",
-            "backdropHueRotate": "backdrop-hue-rotate",
-            "backdropInvert": "backdrop-invert",
-            "backdropOpacity": "backdrop-opacity",
-            "backdropSaturate": "backdrop-saturate",
-            "backdropSepia": "backdrop-sepia",
+
             "backgroundColor": "bg",
             "backgroundOpacity": "bg-opacity",
             "borderColor": "border",
@@ -2133,6 +2251,9 @@ class Tailwind:
                         if res:
                             gp_res = gp
                     if len(j) == 2:
+                        if gp == "filter":
+                            if "filter" not in j:
+                                j.insert(0, "filter")
                         res = self.classes[gp].get(j[1], "")
                         if isinstance(res, dict):
                             res = res.get("DEFAULT", "")
@@ -2165,7 +2286,7 @@ class Tailwind:
                             gp_res = gp
                     if res:
                         if (isinstance(res, str) or (isinstance(res, list) and isinstance(res[0], str))) and gp not in [
-                            "from", "to", "via"]:
+                                "from", "to", "via"]:
                             result_css_to_add = (".%s {%s: %s;}" %
                                                  (
                                                      self.sanitize_class_name(ori_i),
@@ -2194,7 +2315,7 @@ class Tailwind:
         return "".join(vals)
 
     def process_opacity(self, css_class, opacity):
-        hex_regex = re.compile(r"[ '\"]#[0-9a-fA-F]{6,8}")
+        hex_regex = re.compile(r"[ '\"]#[0-9a-fA-F]{3,8}")
         hexes = hex_regex.findall(css_class)
         hexes = sorted(hexes, key=len, reverse=True)
         for _hex in hexes:
@@ -2209,6 +2330,8 @@ class Tailwind:
     @staticmethod
     def hex_to_rgb(hex_color):
         hex_color = hex_color.lstrip('#')
+        if len(hex_color) == 3:
+            hex_color = ''.join([c * 2 for c in hex_color])
         r = int(hex_color[0:2], 16)
         g = int(hex_color[2:4], 16)
         b = int(hex_color[4:6], 16)
