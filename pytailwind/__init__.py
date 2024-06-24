@@ -1,5 +1,7 @@
 import re
 
+__version__ = '0.0.3'
+
 
 class Tailwind:
     def __init__(self):
