@@ -30,3 +30,4 @@ pytailwind = "pytailwind.__main__:main"
 
 [tool.setuptools.packages.find]
 include = ["pytailwind*"]
+
