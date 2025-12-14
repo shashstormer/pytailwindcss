@@ -3,8 +3,6 @@ from html.parser import HTMLParser
 from .defaults import COLORS
 from .classes import CLASSES, DYNAMIC_VALUE, MULTI_REQUIREMENT
 
-__version__ = '0.0.3'
-
 
 class ClassExtractor(HTMLParser):
     def __init__(self):
