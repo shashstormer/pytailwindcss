@@ -1,0 +1,1500 @@
+
+from .defaults import COLORS, SPACING
+
+CLASSES = {
+    "accentColor": {
+        "auto": 'auto',
+    },
+    "animationNames": {
+        "none": 'none',
+        "spin": 'spin 1s linear var(--tw-animation-count, infinite)',
+        "ping": 'ping 1s cubic-bezier(0, 0, 0.2, 1) var(--tw-animation-count, infinite)',
+        "pulse": 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) var(--tw-animation-count, infinite)',
+        "bounce": 'bounce 1s var(--tw-animation-count, infinite)',
+    },
+    # "animationDuration": {
+    #     "seconds": "s",  # Duration in seconds
+    #     "milliseconds": "ms"  # Duration in milliseconds
+    # },
+    "animationTimingFunction": {
+        "ease": "ease",
+        "linear": "linear",
+        "easein": "ease-in",
+        "easeout": "ease-out",
+        "easeinout": "ease-in-out",
+        "stepstart": "step-start",
+        "stepend": "step-end",
+        # "steps": "steps(int, start|end)",  # Custom steps
+        # "cubicBezier": "cubic-bezier(n,n,n,n)"  # Custom cubic-bezier
+    },
+    # "animationDelay": {
+    #     "seconds": "s",  # Delay in seconds
+    #     "milliseconds": "ms"  # Delay in milliseconds
+    # },
+    "animationIterationCount": {
+        "infinite": "infinite",
+        # "number": "number"  # Specific number of iterations
+    },
+    "animationDirection": {
+        "normal": "normal",
+        "reverse": "reverse",
+        "alternate": "alternate",
+        "alternateReverse": "alternate-reverse"
+    },
+    "animationFillMode": {
+        "none": "none",
+        "forwards": "forwards",
+        "backwards": "backwards",
+        "both": "both"
+    },
+    "animationPlayState": {
+        "running": "running",
+        "paused": "paused"
+    },
+    "aria": {
+        "busy": 'busy="true"',
+        "checked": 'checked="true"',
+        "disabled": 'disabled="true"',
+        "expanded": 'expanded="true"',
+        "hidden": 'hidden="true"',
+        "pressed": 'pressed="true"',
+        "readonly": 'readonly="true"',
+        "required": 'required="true"',
+        "selected": 'selected="true"',
+    },
+    "aspectRatio": {
+        "auto": 'auto',
+        "square": '1 / 1',
+        "video": '16 / 9',
+    },
+    "backdrop-filter": {
+        "blur": {
+            "sm": "blur(4px)",
+            "DEFAULT": "blur(8px)",
+            "md": "blur(12px)",
+            "lg": "blur(16px)",
+            "xl": "blur(24px)",
+            "2xl": "blur(40px)",
+            "3xl": "blur(64px)"
+        },
+        "brightness": {
+            "0": "brightness(0)",
+            "50": "brightness(.5)",
+            "75": "brightness(.75)",
+            "90": "brightness(.9)",
+            "95": "brightness(.95)",
+            "100": "brightness(1)",
+            "105": "brightness(1.05)",
+            "110": "brightness(1.1)",
+            "125": "brightness(1.25)",
+            "150": "brightness(1.5)",
+            "200": "brightness(2)"
+        },
+        "contrast": {
+            "0": "contrast(0)",
+            "50": "contrast(.5)",
+            "75": "contrast(.75)",
+            "100": "contrast(1)",
+            "125": "contrast(1.25)",
+            "150": "contrast(1.5)",
+            "200": "contrast(2)"
+        },
+        "grayscale": {
+            "0": "grayscale(0)",
+            "DEFAULT": "grayscale(1)"
+        },
+        "hue-rotate": {
+            "0": "hue-rotate(0deg)",
+            "15": "hue-rotate(15deg)",
+            "30": "hue-rotate(30deg)",
+            "60": "hue-rotate(60deg)",
+            "90": "hue-rotate(90deg)",
+            "180": "hue-rotate(180deg)"
+        },
+        "invert": {
+            "0": "invert(0)",
+            "DEFAULT": "invert(1)"
+        },
+        "opacity": {
+            "0": "opacity(0)",
+            "5": "opacity(.05)",
+            "10": "opacity(.1)",
+            "20": "opacity(.2)",
+            "25": "opacity(.25)",
+            "30": "opacity(.3)",
+            "40": "opacity(.4)",
+            "50": "opacity(.5)",
+            "60": "opacity(.6)",
+            "70": "opacity(.7)",
+            "75": "opacity(.75)",
+            "80": "opacity(.8)",
+            "90": "opacity(.9)",
+            "95": "opacity(.95)",
+            "100": "opacity(1)"
+        },
+        "saturate": {
+            "0": "saturate(0)",
+            "50": "saturate(.5)",
+            "100": "saturate(1)",
+            "150": "saturate(1.5)",
+            "200": "saturate(2)"
+        },
+        "sepia": {
+            "0": "sepia(0)",
+            "DEFAULT": "sepia(1)"
+        }
+    },
+    "backgroundImage": {
+        "none": 'none',
+        "gradient": {
+            "to": {
+                "t": "linear-gradient(to top, var(--tw-gradient-stops))",
+                "tr": "linear-gradient(to top right, var(--tw-gradient-stops))",
+                "r": "linear-gradient(to right, var(--tw-gradient-stops))",
+                "br": "linear-gradient(to bottom right, var(--tw-gradient-stops))",
+                "b": "linear-gradient(to bottom, var(--tw-gradient-stops))",
+                "bl": "linear-gradient(to bottom left, var(--tw-gradient-stops))",
+                "l": "linear-gradient(to left, var(--tw-gradient-stops))",
+                "tl": "linear-gradient(to top left, var(--tw-gradient-stops))"
+            }
+        }
+    },
+    "backgroundPosition": {
+        "bottom": 'bottom',
+        "center": 'center',
+        "left": 'left',
+        'left-bottom': 'left bottom',
+        'left-top': 'left top',
+        "right": 'right',
+        'right-bottom': 'right bottom',
+        'right-top': 'right top',
+        "top": 'top',
+    },
+    "backgroundSize": {
+        "auto": 'auto',
+        "cover": 'cover',
+        "contain": 'contain',
+    },
+    "break": {
+        "normal": [{"word-break": "normal", "overflow-wrap": "normal"}],
+        "words": [{"overflow-wrap": "break-word"}],
+        "all": [{"word-break": "break-all"}],
+        "keep": [{"word-break": "keep-all"}],
+    },
+    "borderRadius": {
+        "none": '0px',
+        "sm": '0.125rem',
+        "DEFAULT": '0.25rem',
+        "md": '0.375rem',
+        "lg": '0.5rem',
+        "xl": '0.75rem',
+        '2xl': '1rem',
+        '3xl': '1.5rem',
+        "full": '9999px',
+    },
+    "borderWidth": {
+        "DEFAULT": '1px',
+        "0": '0px',
+        "2": '2px',
+        "4": '4px',
+        "8": '8px',
+        "x": {
+            "0": [{"border-left-width": "0px", "border-right-width": "0px"}],
+            "2": [{"border-left-width": "2px", "border-right-width": "2px"}],
+            "4": [{"border-left-width": "4px", "border-right-width": "4px"}],
+            "8": [{"border-left-width": "8px", "border-right-width": "8px"}],
+            "DEFAULT": [{"border-left-width": "1px", "border-right-width": "1px"}],
+        },
+        "y": {
+            "0": [{"border-top-width": "0px", "border-bottom-width": "0px"}],
+            "2": [{"border-top-width": "2px", "border-bottom-width": "2px"}],
+            "4": [{"border-top-width": "4px", "border-bottom-width": "4px"}],
+            "8": [{"border-top-width": "8px", "border-bottom-width": "8px"}],
+            "DEFAULT": [{"border-top-width": "1px", "border-bottom-width": "1px"}]
+        },
+        "s": {
+            "0": [{"border-inline-start-width": "0px"}],
+            "2": [{"border-inline-start-width": "2px"}],
+            "4": [{"border-inline-start-width": "4px"}],
+            "8": [{"border-inline-start-width": "8px"}],
+            "DEFAULT": [{"border-inline-start-width": "1px"}]
+        },
+        "e": {
+            "0": [{"border-inline-end-width": "0px"}],
+            "2": [{"border-inline-end-width": "2px"}],
+            "4": [{"border-inline-end-width": "4px"}],
+            "8": [{"border-inline-end-width": "8px"}],
+            "DEFAULT": [{"border-inline-end-width": "1px"}]
+        },
+        "t": {
+            "0": [{"border-top-width": "0px"}],
+            "2": [{"border-top-width": "2px"}],
+            "4": [{"border-top-width": "4px"}],
+            "8": [{"border-top-width": "8px"}],
+            "DEFAULT": [{"border-top-width": "1px"}]
+        },
+        "r": {
+            "0": [{"border-right-width": "0px"}],
+            "2": [{"border-right-width": "2px"}],
+            "4": [{"border-right-width": "4px"}],
+            "8": [{"border-right-width": "8px"}],
+            "DEFAULT": [{"border-right-width": "1px"}]
+        },
+        "b": {
+            "0": [{"border-bottom-width": "0px"}],
+            "2": [{"border-bottom-width": "2px"}],
+            "4": [{"border-bottom-width": "4px"}],
+            "8": [{"border-bottom-width": "8px"}],
+            "DEFAULT": [{"border-bottom-width": "1px"}]
+        },
+        "l": {
+            "0": [{"border-left-width": "0px"}],
+            "2": [{"border-left-width": "2px"}],
+            "4": [{"border-left-width": "4px"}],
+            "8": [{"border-left-width": "8px"}],
+            "DEFAULT": [{"border-left-width": "1px"}]
+        }
+
+    },
+    "boxShadow": {
+        "sm": '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+        "DEFAULT": '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+        "md": '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        "lg": '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+        "xl": '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+        '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+        "inner": 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
+        "none": 'none',
+    },
+    "brightness": {
+        "0": '0',
+        '50': '.5',
+        "75": '.75',
+        "90": '.9',
+        "95": '.95',
+        "100": '1',
+        "105": '1.05',
+        "110": '1.1',
+        "125": '1.25',
+        "150": '1.5',
+        "200": '2',
+    },
+    "colors": COLORS,
+    "columns": {
+        "auto": 'auto',
+        "1": '1',
+        "2": '2',
+        "3": '3',
+        "4": '4',
+        "5": '5',
+        "6": '6',
+        "7": '7',
+        "8": '8',
+        "9": '9',
+        "10": '10',
+        "11": '11',
+        "12": '12',
+        '3xs': '16rem',
+        '2xs': '18rem',
+        "xs": '20rem',
+        "sm": '24rem',
+        "md": '28rem',
+        "lg": '32rem',
+        "xl": '36rem',
+        '2xl': '42rem',
+        '3xl': '48rem',
+        '4xl': '56rem',
+        '5xl': '64rem',
+        '6xl': '72rem',
+        '7xl': '80rem',
+    },
+    'container': {},
+    'content': {
+        'none': 'none',
+    },
+    'contrast': {
+        '0': '0',
+        '50': '.5',
+        '75': '.75',
+        '100': '1',
+        '125': '1.25',
+        '150': '1.5',
+        '200': '2',
+    },
+    'cursor': {
+        'auto': 'auto',
+        'default': 'default',
+        'DEFAULT': 'default',
+        'pointer': 'pointer',
+        'wait': 'wait',
+        'text': 'text',
+        'move': 'move',
+        'help': 'help',
+        'not-allowed': 'not-allowed',
+        'none': 'none',
+        'context-menu': 'context-menu',
+        'progress': 'progress',
+        'cell': 'cell',
+        'crosshair': 'crosshair',
+        'vertical-text': 'vertical-text',
+        'alias': 'alias',
+        'copy': 'copy',
+        'no-drop': 'no-drop',
+        'grab': 'grab',
+        'grabbing': 'grabbing',
+        'all-scroll': 'all-scroll',
+        'col-resize': 'col-resize',
+        'row-resize': 'row-resize',
+        'n-resize': 'n-resize',
+        'e-resize': 'e-resize',
+        's-resize': 's-resize',
+        'w-resize': 'w-resize',
+        'ne-resize': 'ne-resize',
+        'nw-resize': 'nw-resize',
+        'se-resize': 'se-resize',
+        'sw-resize': 'sw-resize',
+        'ew-resize': 'ew-resize',
+        'ns-resize': 'ns-resize',
+        'nesw-resize': 'nesw-resize',
+        'nwse-resize': 'nwse-resize',
+        'zoom-in': 'zoom-in',
+        'zoom-out': 'zoom-out',
+    },
+    "dropShadow": {
+        "sm": '0 1px 1px rgb(0 0 0 / 0.05)',
+        "DEFAULT": ['0 1px 2px rgb(0 0 0 / 0.1)', '0 1px 1px rgb(0 0 0 / 0.06)'],
+        "md": ['0 4px 3px rgb(0 0 0 / 0.07)', '0 2px 2px rgb(0 0 0 / 0.06)'],
+        "lg": ['0 10px 8px rgb(0 0 0 / 0.04)', '0 4px 3px rgb(0 0 0 / 0.1)'],
+        "xl": ['0 20px 13px rgb(0 0 0 / 0.03)', '0 8px 5px rgb(0 0 0 / 0.08)'],
+        '2xl': '0 25px 25px rgb(0 0 0 / 0.15)',
+        "none": '0 0 #0000',
+    },
+    "display": {
+        "block": "block",
+        "inline": "inline",
+        "inline-block": "inline-block",
+        "flex": "flex",
+        "inline-flex": "inline-flex",
+        "grid": "grid",
+        "inline-grid": "inline-grid",
+        "table": "table",
+        "inline-table": "inline-table",
+        "table-row": "table-row",
+        "table-cell": "table-cell",
+        "none": "none",
+        "hidden": "none"
+    },
+    "fill": COLORS,
+    "filter": {
+        "blur": {
+            "sm": "blur(4px)",
+            "DEFAULT": "blur(8px)",
+            "md": "blur(12px)",
+            "lg": "blur(16px)",
+            "xl": "blur(24px)",
+            "2xl": "blur(40px)",
+            "3xl": "blur(64px)"
+        },
+        "brightness": {
+            "0": "brightness(0)",
+            "50": "brightness(.5)",
+            "75": "brightness(.75)",
+            "90": "brightness(.9)",
+            "95": "brightness(.95)",
+            "100": "brightness(1)",
+            "105": "brightness(1.05)",
+            "110": "brightness(1.1)",
+            "125": "brightness(1.25)",
+            "150": "brightness(1.5)",
+            "200": "brightness(2)"
+        },
+        "contrast": {
+            "0": "contrast(0)",
+            "50": "contrast(.5)",
+            "75": "contrast(.75)",
+            "100": "contrast(1)",
+            "125": "contrast(1.25)",
+            "150": "contrast(1.5)",
+            "200": "contrast(2)"
+        },
+        "drop-shadow": {
+            "sm": "drop-shadow(0 1px 1px rgba(0,0,0,0.05))",
+            "DEFAULT": "drop-shadow(0 1px 2px rgba(0,0,0,0.1))",
+            "md": "drop-shadow(0 4px 3px rgba(0,0,0,0.07))",
+            "lg": "drop-shadow(0 10px 8px rgba(0,0,0,0.04))",
+            "xl": "drop-shadow(0 20px 13px rgba(0,0,0,0.03))",
+            "2xl": "drop-shadow(0 25px 25px rgba(0,0,0,0.15))",
+            "none": "drop-shadow(0 0 #0000)"
+        },
+        "grayscale": {
+            "0": "grayscale(0)",
+            "DEFAULT": "grayscale(1)"
+        },
+        "hue-rotate": {
+            "0": "hue-rotate(0deg)",
+            "15": "hue-rotate(15deg)",
+            "30": "hue-rotate(30deg)",
+            "60": "hue-rotate(60deg)",
+            "90": "hue-rotate(90deg)",
+            "180": "hue-rotate(180deg)"
+        },
+        "invert": {
+            "0": "invert(0)",
+            "DEFAULT": "invert(1)"
+        },
+        "saturate": {
+            "0": "saturate(0)",
+            "50": "saturate(.5)",
+            "100": "saturate(1)",
+            "150": "saturate(1.5)",
+            "200": "saturate(2)"
+        },
+        "sepia": {
+            "0": "sepia(0)",
+            "DEFAULT": "sepia(1)"
+        }
+    },
+    "flex": {
+        "1": '1 1 0%',
+        "auto": '1 1 auto',
+        "initial": '0 1 auto',
+        "none": 'none',
+    },
+    "flexBasis": {
+        "auto": 'auto',
+        '1/2': '50%',
+        '1/3': '33.333333%',
+        '2/3': '66.666667%',
+        '1/4': '25%',
+        '2/4': '50%',
+        '3/4': '75%',
+        '1/5': '20%',
+        '2/5': '40%',
+        '3/5': '60%',
+        '4/5': '80%',
+        '1/6': '16.666667%',
+        '2/6': '33.333333%',
+        '3/6': '50%',
+        '4/6': '66.666667%',
+        '5/6': '83.333333%',
+        '1/12': '8.333333%',
+        '2/12': '16.666667%',
+        '3/12': '25%',
+        '4/12': '33.333333%',
+        '5/12': '41.666667%',
+        '6/12': '50%',
+        '7/12': '58.333333%',
+        '8/12': '66.666667%',
+        '9/12': '75%',
+        '10/12': '83.333333%',
+        '11/12': '91.666667%',
+        "full": '100%',
+    },
+    "flexGrow": {
+        "0": '0',
+        "DEFAULT": '1',
+    },
+    "flexShrink": {
+        "0": '0',
+        "DEFAULT": '1',
+    },
+    "fontFamily": {
+        "sans": [
+            'ui-sans-serif',
+            'system-ui',
+            'sans-serif',
+            '"Apple Color Emoji"',
+            '"Segoe UI Emoji"',
+            '"Segoe UI Symbol"',
+            '"Noto Color Emoji"',
+        ],
+        "serif": ['ui-serif', 'Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
+        "mono": [
+            'ui-monospace',
+            'SFMono-Regular',
+            'Menlo',
+            'Monaco',
+            'Consolas',
+            '"Liberation Mono"',
+            '"Courier New"',
+            'monospace',
+        ],
+    },
+    "fontSize": {
+        "xs": ['0.75rem', {"lineHeight": '1rem'}],
+        "sm": ['0.875rem', {"lineHeight": '1.25rem'}],
+        "base": ['1rem', {"lineHeight": '1.5rem'}],
+        "lg": ['1.125rem', {"lineHeight": '1.75rem'}],
+        "xl": ['1.25rem', {"lineHeight": '1.75rem'}],
+        '2xl': ['1.5rem', {"lineHeight": '2rem'}],
+        '3xl': ['1.875rem', {"lineHeight": '2.25rem'}],
+        '4xl': ['2.25rem', {"lineHeight": '2.5rem'}],
+        '5xl': ['3rem', {"lineHeight": '1'}],
+        '6xl': ['3.75rem', {"lineHeight": '1'}],
+        '7xl': ['4.5rem', {"lineHeight": '1'}],
+        '8xl': ['6rem', {"lineHeight": '1'}],
+        '9xl': ['8rem', {"lineHeight": '1'}],
+    },
+    "fontSmoothing": {
+        "antialiased": {
+            "-webkit-font-smoothing": "antialiased",
+            "-moz-osx-font-smoothing": "grayscale"
+        },
+        "subpixel-antialiased": {
+            "-webkit-font-smoothing": "auto",
+            "-moz-osx-font-smoothing": "auto"
+        }
+    },
+    "fontStyle": {
+        "italic": "italic",
+        'oblique': "oblique",
+        "not-italic": "normal"
+    },
+    "fontWeight": {
+        "thin": '100',
+        "extralight": '200',
+        "light": '300',
+        "normal": '400',
+        "medium": '500',
+        "semibold": '600',
+        "bold": '700',
+        "extrabold": '800',
+        "black": '900',
+    },
+    "gradientColorStopPositions": {
+        '0%': '0%',
+        '5%': '5%',
+        '10%': '10%',
+        '15%': '15%',
+        '20%': '20%',
+        '25%': '25%',
+        '30%': '30%',
+        '35%': '35%',
+        '40%': '40%',
+        '45%': '45%',
+        '50%': '50%',
+        '55%': '55%',
+        '60%': '60%',
+        '65%': '65%',
+        '70%': '70%',
+        '75%': '75%',
+        '80%': '80%',
+        '85%': '85%',
+        '90%': '90%',
+        '95%': '95%',
+        '100%': '100%',
+    },
+    "grayscale": {
+        "0": '0',
+        "DEFAULT": '100%',
+    },
+    "gridAutoColumns": {
+        "auto": 'auto',
+        "min": 'min-content',
+        "max": 'max-content',
+        "fr": 'minmax(0, 1fr)',
+    },
+    "gridAutoRows": {
+        "auto": 'auto',
+        "min": 'min-content',
+        "max": 'max-content',
+        "fr": 'minmax(0, 1fr)',
+    },
+    "gridColumn": {
+        "auto": 'auto',
+        'span-1': 'span 1 / span 1',
+        'span-2': 'span 2 / span 2',
+        'span-3': 'span 3 / span 3',
+        'span-4': 'span 4 / span 4',
+        'span-5': 'span 5 / span 5',
+        'span-6': 'span 6 / span 6',
+        'span-7': 'span 7 / span 7',
+        'span-8': 'span 8 / span 8',
+        'span-9': 'span 9 / span 9',
+        'span-10': 'span 10 / span 10',
+        'span-11': 'span 11 / span 11',
+        'span-12': 'span 12 / span 12',
+        'span-full': '1 / -1',
+    },
+    "gridColumnEnd": {
+        "auto": 'auto',
+        "1": '1',
+        "2": '2',
+        "3": '3',
+        "4": '4',
+        "5": '5',
+        "6": '6',
+        "7": '7',
+        "8": '8',
+        "9": '9',
+        "10": '10',
+        "11": '11',
+        "12": '12',
+        "13": '13',
+    },
+    "gridColumnStart": {
+        "auto": 'auto',
+        "1": '1',
+        "2": '2',
+        "3": '3',
+        "4": '4',
+        "5": '5',
+        "6": '6',
+        "7": '7',
+        "8": '8',
+        "9": '9',
+        "10": '10',
+        "11": '11',
+        "12": '12',
+        "13": '13',
+    },
+    "gridRow": {
+        "auto": 'auto',
+        'span-1': 'span 1 / span 1',
+        'span-2': 'span 2 / span 2',
+        'span-3': 'span 3 / span 3',
+        'span-4': 'span 4 / span 4',
+        'span-5': 'span 5 / span 5',
+        'span-6': 'span 6 / span 6',
+        'span-7': 'span 7 / span 7',
+        'span-8': 'span 8 / span 8',
+        'span-9': 'span 9 / span 9',
+        'span-10': 'span 10 / span 10',
+        'span-11': 'span 11 / span 11',
+        'span-12': 'span 12 / span 12',
+        'span-full': '1 / -1',
+    },
+    "gridRowEnd": {
+        "auto": 'auto',
+        "1": '1',
+        "2": '2',
+        "3": '3',
+        "4": '4',
+        "5": '5',
+        "6": '6',
+        "7": '7',
+        "8": '8',
+        "9": '9',
+        "10": '10',
+        "11": '11',
+        "12": '12',
+        "13": '13',
+    },
+    "gridRowStart": {
+        "auto": 'auto',
+        "1": '1',
+        "2": '2',
+        "3": '3',
+        "4": '4',
+        "5": '5',
+        "6": '6',
+        "7": '7',
+        "8": '8',
+        "9": '9',
+        "10": '10',
+        "11": '11',
+        "12": '12',
+        "13": '13',
+    },
+    "gridTemplateColumns": {
+        "none": 'none',
+        "subgrid": 'subgrid',
+        "1": 'repeat(1, minmax(0, 1fr))',
+        "2": 'repeat(2, minmax(0, 1fr))',
+        "3": 'repeat(3, minmax(0, 1fr))',
+        "4": 'repeat(4, minmax(0, 1fr))',
+        "5": 'repeat(5, minmax(0, 1fr))',
+        "6": 'repeat(6, minmax(0, 1fr))',
+        "7": 'repeat(7, minmax(0, 1fr))',
+        "8": 'repeat(8, minmax(0, 1fr))',
+        "9": 'repeat(9, minmax(0, 1fr))',
+        "10": 'repeat(10, minmax(0, 1fr))',
+        "11": 'repeat(11, minmax(0, 1fr))',
+        "12": 'repeat(12, minmax(0, 1fr))',
+    },
+    "gridTemplateRows": {
+        "none": 'none',
+        "subgrid": 'subgrid',
+        "1": 'repeat(1, minmax(0, 1fr))',
+        "2": 'repeat(2, minmax(0, 1fr))',
+        "3": 'repeat(3, minmax(0, 1fr))',
+        "4": 'repeat(4, minmax(0, 1fr))',
+        "5": 'repeat(5, minmax(0, 1fr))',
+        "6": 'repeat(6, minmax(0, 1fr))',
+        "7": 'repeat(7, minmax(0, 1fr))',
+        "8": 'repeat(8, minmax(0, 1fr))',
+        "9": 'repeat(9, minmax(0, 1fr))',
+        "10": 'repeat(10, minmax(0, 1fr))',
+        "11": 'repeat(11, minmax(0, 1fr))',
+        "12": 'repeat(12, minmax(0, 1fr))',
+    },
+    "height": {
+        "auto": 'auto',
+        '1/2': '50%',
+        '1/3': '33.333333%',
+        '2/3': '66.666667%',
+        '1/4': '25%',
+        '2/4': '50%',
+        '3/4': '75%',
+        '1/5': '20%',
+        '2/5': '40%',
+        '3/5': '60%',
+        '4/5': '80%',
+        '1/6': '16.666667%',
+        '2/6': '33.333333%',
+        '3/6': '50%',
+        '4/6': '66.666667%',
+        '5/6': '83.333333%',
+        "full": '100%',
+        "screen": '100vh',
+        "svh": '100svh',
+        "lvh": '100lvh',
+        "dvh": '100dvh',
+        "min": 'min-content',
+        "max": 'max-content',
+        "fit": 'fit-content',
+    },
+    "hueRotate": {
+        "0": '0deg',
+        "15": '15deg',
+        "30": '30deg',
+        "60": '60deg',
+        "90": '90deg',
+        "180": '180deg',
+    },
+    "inset": {
+        "auto": 'auto',
+        '1/2': '50%',
+        '1/3': '33.333333%',
+        '2/3': '66.666667%',
+        '1/4': '25%',
+        '2/4': '50%',
+        '3/4': '75%',
+        "full": '100%',
+    },
+    "invert": {
+        "0": '0',
+        "DEFAULT": '100%',
+    },
+    "keyframes": {
+        "spin": {
+            "to": {
+                "transform": 'rotate(360deg)',
+            },
+        },
+        "ping": {
+            '75%, 100%': {
+                "transform": 'scale(2)',
+                "opacity": '0',
+            },
+        },
+        "pulse": {
+            '50%': {
+                "opacity": '.5',
+            },
+        },
+        "bounce": {
+            '0%, 100%': {
+                "transform": 'translateY(-25%)',
+                "animationTimingFunction": 'cubic-bezier(0.8,0,1,1)',
+            },
+            '50%': {
+                "transform": 'none',
+                "animationTimingFunction": 'cubic-bezier(0,0,0.2,1)',
+            },
+        },
+    },
+    "letterSpacing": {
+        "tighter": '-0.05em',
+        "tight": '-0.025em',
+        "normal": '0em',
+        "wide": '0.025em',
+        "wider": '0.05em',
+        "widest": '0.1em',
+    },
+    "leading": {
+        "3": ".75rem",
+        "4": "1rem",
+        "5": "1.25rem",
+        "6": "1.5rem",
+        "7": "1.75rem",
+        "8": "2rem",
+        "9": "2.25rem",
+        "10": "2.5rem",
+        "none": "1",
+        "tight": "1.25",
+        "snug": "1.375",
+        "normal": "1.5",
+        "relaxed": "1.625",
+        "loose": "2"
+    },
+    "lineHeight": {
+        "none": '1',
+        "tight": '1.25',
+        "snug": '1.375',
+        "normal": '1.5',
+        "relaxed": '1.625',
+        "loose": '2',
+        "3": '.75rem',
+        "4": '1rem',
+        "5": '1.25rem',
+        "6": '1.5rem',
+        "7": '1.75rem',
+        "8": '2rem',
+        "9": '2.25rem',
+        "10": '2.5rem',
+    },
+    "listStyleType": {
+        "none": 'none',
+        "disc": 'disc',
+        "decimal": 'decimal',
+    },
+    "listStyleImage": {
+        "none": 'none',
+    },
+    "margin": {
+        "auto": 'auto',
+    },
+    "lineClamp": {
+        "1": '1',
+        "2": '2',
+        "3": '3',
+        "4": '4',
+        "5": '5',
+        "6": '6',
+    },
+    "maxHeight": {
+        "none": 'none',
+        "full": '100%',
+        "screen": '100vh',
+        "svh": '100svh',
+        "lvh": '100lvh',
+        "dvh": '100dvh',
+        "min": 'min-content',
+        "max": 'max-content',
+        "fit": 'fit-content',
+    },
+    "maxWidth": {
+        "none": 'none',
+        "xs": '20rem',
+        "sm": '24rem',
+        "md": '28rem',
+        "lg": '32rem',
+        "xl": '36rem',
+        '2xl': '42rem',
+        '3xl': '48rem',
+        '4xl': '56rem',
+        '5xl': '64rem',
+        '6xl': '72rem',
+        '7xl': '80rem',
+        "full": '100%',
+        "min": 'min-content',
+        "max": 'max-content',
+        "fit": 'fit-content',
+        "prose": '65ch',
+        # ...
+        # breakpoints(theme('screens')),
+    },
+    "minHeight": {
+        "full": '100%',
+        "screen": '100vh',
+        "svh": '100svh',
+        "lvh": '100lvh',
+        "dvh": '100dvh',
+        "min": 'min-content',
+        "max": 'max-content',
+        "fit": 'fit-content',
+    },
+    "minWidth": {
+        "full": '100%',
+        "min": 'min-content',
+        "max": 'max-content',
+        "fit": 'fit-content',
+    },
+    "objectPosition": {
+        "bottom": 'bottom',
+        "center": 'center',
+        "left": 'left',
+        'left-bottom': 'left bottom',
+        'left-top': 'left top',
+        "right": 'right',
+        'right-bottom': 'right bottom',
+        'right-top': 'right top',
+        "top": 'top',
+    },
+    "opacity": {
+        "0": '0',
+        "5": '0.05',
+        "10": '0.1',
+        "15": '0.15',
+        "20": '0.2',
+        "25": '0.25',
+        "30": '0.3',
+        "35": '0.35',
+        "40": '0.4',
+        "45": '0.45',
+        "50": '0.5',
+        "55": '0.55',
+        "60": '0.6',
+        "65": '0.65',
+        "70": '0.7',
+        "75": '0.75',
+        "80": '0.8',
+        "85": '0.85',
+        "90": '0.9',
+        "95": '0.95',
+        "100": '1',
+    },
+    "order": {
+        "first": '-9999',
+        "last": '9999',
+        "none": '0',
+        "1": '1',
+        "2": '2',
+        "3": '3',
+        "4": '4',
+        "5": '5',
+        "6": '6',
+        "7": '7',
+        "8": '8',
+        "9": '9',
+        "10": '10',
+        "11": '11',
+        "12": '12',
+    },
+    "overflow": {
+        "auto": "auto",
+        "hidden": "hidden",
+        "clip": "clip",
+        "visible": "visible",
+        "scroll": "scroll",
+        "x": {
+            "auto": "auto",
+            "hidden": "hidden",
+            "clip": "clip",
+            "visible": "visible",
+            "scroll": "scroll"
+        },
+        "y": {
+            "auto": "auto",
+            "hidden": "hidden",
+            "clip": "clip",
+            "visible": "visible",
+            "scroll": "scroll"
+        }
+    },
+    "outlineOffset": {
+        "0": '0px',
+        "1": '1px',
+        "2": '2px',
+        "4": '4px',
+        "8": '8px',
+    },
+    "outlineWidth": {
+        "0": '0px',
+        "1": '1px',
+        "2": '2px',
+        "4": '4px',
+        "8": '8px',
+    },
+    "position": {
+        'static': 'static',
+        'relative': 'relative',
+        'absolute': 'absolute',
+        'fixed': 'fixed',
+        'sticky': 'sticky'
+    },
+    "ringColor": {
+        "DEFAULT": '#3b82f6'  # theme('colors.blue.500', '#3b82f6'),
+    },
+    "ringOffsetWidth": {
+        "0": '0px',
+        "1": '1px',
+        "2": '2px',
+        "4": '4px',
+        "8": '8px',
+    },
+    "ringOpacity": {
+        "DEFAULT": '0.5',
+    },
+    "ringWidth": {
+        "DEFAULT": '3px',
+        "0": '0px',
+        "1": '1px',
+        "2": '2px',
+        "4": '4px',
+        "8": '8px',
+    },
+    "rotate": {
+        "0": '0deg',
+        "1": '1deg',
+        "2": '2deg',
+        "3": '3deg',
+        "6": '6deg',
+        "12": '12deg',
+        "45": '45deg',
+        "90": '90deg',
+        "180": '180deg',
+    },
+    "saturate": {
+        "0": '0',
+        "50": '.5',
+        "100": '1',
+        "150": '1.5',
+        "200": '2',
+    },
+    "scale": {
+        "0": '0',
+        "50": '.5',
+        "75": '.75',
+        "90": '.9',
+        "95": '.95',
+        "100": '1',
+        "105": '1.05',
+        "110": '1.1',
+        "125": '1.25',
+        "150": '1.5',
+    },
+    "screens": {
+        "sm": '640px',
+        "md": '768px',
+        "lg": '1024px',
+        "xl": '1280px',
+        '2xl': '1536px',
+    },
+    "scroll": {
+        "auto": "auto",
+        "smooth": "smooth",
+    },
+    "sepia": {
+        "0": '0',
+        "DEFAULT": '100%',
+    },
+    "skew": {
+        "0": '0deg',
+        "1": '1deg',
+        "2": '2deg',
+        "3": '3deg',
+        "6": '6deg',
+        "12": '12deg',
+    },
+    "spacing": SPACING,
+    "srOnly": {
+        "DEFAULT": {
+            "position": "absolute",
+            "width": "1px",
+            "height": "1px",
+            "padding": "0",
+            "margin": "-1px",
+            "overflow": "hidden",
+            "clip": "rect(0, 0, 0, 0)",
+            "white-space": "nowrap",
+            "border-width": "0"
+        },
+    },
+    "stroke": {
+        "none": 'none',
+    },
+    "strokeWidth": {
+        "0": '0',
+        "1": '1',
+        "2": '2',
+    },
+    "supports": {},
+    "data": {},
+    "textAlign": {
+        "left": "left",  # Align text to the left
+        "right": "right",  # Align text to the right
+        "center": "center",  # Center-align text
+        "justify": "justify",  # Justify text
+        "initial": "initial",  # Sets the text-align property to its DEFAULT value
+        "inherit": "inherit"  # Inherits the text-align property from its parent element
+    },
+    "textDecorationThickness": {
+        "auto": 'auto',
+        'from-font': 'from-font',
+        "0": '0px',
+        "1": '1px',
+        "2": '2px',
+        "4": '4px',
+        "8": '8px',
+    },
+    "textDecoration": {
+        "none": "none",
+        "underline": "underline",
+        "overline": "overline",
+        "line-through": "line-through",
+        "blink": "blink",  # Note: Blink is not widely supported
+    },
+    "textTransform": {
+        "uppercase": "uppercase",
+        "lowercase": "lowercase",
+        "capitalize": "capitalize",
+        "normal-case": "none"
+    },
+    "textWrap": {
+        "wrap": "wrap",
+        "nowrap": "nowrap",
+        "balance": "balance",
+        "pretty": "pretty"
+    },
+    "textUnderlineOffset": {
+        "auto": 'auto',
+        "0": '0px',
+        "1": '1px',
+        "2": '2px',
+        "4": '4px',
+        "8": '8px',
+    },
+    "transformOrigin": {
+        "center": 'center',
+        "top": 'top',
+        'top-right': 'top right',
+        "right": 'right',
+        'bottom-right': 'bottom right',
+        "bottom": 'bottom',
+        'bottom-left': 'bottom left',
+        "left": 'left',
+        'top-left': 'top left',
+    },
+    "transitionDelay": {
+        "0": '0s',
+        "75": '75ms',
+        "100": '100ms',
+        "150": '150ms',
+        "200": '200ms',
+        "300": '300ms',
+        "500": '500ms',
+        "700": '700ms',
+        "1000": '1000ms',
+    },
+    "transitionDuration": {
+        "DEFAULT": '150ms',
+        "0": '0s',
+        "75": '75ms',
+        "100": '100ms',
+        "150": '150ms',
+        "200": '200ms',
+        "300": '300ms',
+        "500": '500ms',
+        "700": '700ms',
+        "1000": '1000ms',
+    },
+    "transitionProperty": {
+        "none": [{"transition-property": "none"}],
+        "all": [{"transition-property": "all"}],
+        "timingFunction": [{"transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)"}],
+        "duration": [{"transition-duration": "150ms"}],
+        "transition": [{
+            "transition-property": "color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter",
+            "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "transition-duration": "150ms"
+        }],
+        "colors": [{
+            "transition-property": "color, background-color, border-color, text-decoration-color, fill, stroke",
+            "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "transition-duration": "150ms"
+        }],
+        "opacity": [{
+            "transition-property": "opacity",
+            "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "transition-duration": "150ms"
+        }],
+        "shadow": [{
+            "transition-property": "box-shadow",
+            "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "transition-duration": "150ms"
+        }],
+        "transform": [{
+            "transition-property": "transform",
+            "transition-timing-function": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "transition-duration": "150ms"
+        }],
+    },
+    "transitionTimingFunction": {
+        "DEFAULT": 'cubic-bezier(0.4, 0, 0.2, 1)',
+        "linear": 'linear',
+        "in": 'cubic-bezier(0.4, 0, 1, 1)',
+        "out": 'cubic-bezier(0, 0, 0.2, 1)',
+        'in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
+    },
+    "translate": {
+        '1/2': '50%',
+        '1/3': '33.333333%',
+        '2/3': '66.666667%',
+        '1/4': '25%',
+        '2/4': '50%',
+        '3/4': '75%',
+        "full": '100%',
+    },
+    "size": {
+        "auto": 'auto',
+        '1/2': '50%',
+        '1/3': '33.333333%',
+        '2/3': '66.666667%',
+        '1/4': '25%',
+        '2/4': '50%',
+        '3/4': '75%',
+        '1/5': '20%',
+        '2/5': '40%',
+        '3/5': '60%',
+        '4/5': '80%',
+        '1/6': '16.666667%',
+        '2/6': '33.333333%',
+        '3/6': '50%',
+        '4/6': '66.666667%',
+        '5/6': '83.333333%',
+        '1/12': '8.333333%',
+        '2/12': '16.666667%',
+        '3/12': '25%',
+        '4/12': '33.333333%',
+        '5/12': '41.666667%',
+        '6/12': '50%',
+        '7/12': '58.333333%',
+        '8/12': '66.666667%',
+        '9/12': '75%',
+        '10/12': '83.333333%',
+        '11/12': '91.666667%',
+        "full": '100%',
+        "min": 'min-content',
+        "max": 'max-content',
+        "fit": 'fit-content',
+    },
+    "width": {
+        "auto": 'auto',
+        '1/2': '50%',
+        '1/3': '33.333333%',
+        '2/3': '66.666667%',
+        '1/4': '25%',
+        '2/4': '50%',
+        '3/4': '75%',
+        '1/5': '20%',
+        '2/5': '40%',
+        '3/5': '60%',
+        '4/5': '80%',
+        '1/6': '16.666667%',
+        '2/6': '33.333333%',
+        '3/6': '50%',
+        '4/6': '66.666667%',
+        '5/6': '83.333333%',
+        '1/12': '8.333333%',
+        '2/12': '16.666667%',
+        '3/12': '25%',
+        '4/12': '33.333333%',
+        '5/12': '41.666667%',
+        '6/12': '50%',
+        '7/12': '58.333333%',
+        '8/12': '66.666667%',
+        '9/12': '75%',
+        '10/12': '83.333333%',
+        '11/12': '91.666667%',
+        "full": '100%',
+        "screen": '100vw',
+        "svw": '100svw',
+        "lvw": '100lvw',
+        "dvw": '100dvw',
+        "min": 'min-content',
+        "max": 'max-content',
+        "fit": 'fit-content',
+    },
+    "willChange": {
+        "auto": 'auto',
+        "scroll": 'scroll-position',
+        "contents": 'contents',
+        "transform": 'transform',
+    },
+    "zIndex": {
+        "auto": 'auto',
+        "0": '0',
+        "10": '10',
+        "20": '20',
+        "30": '30',
+        "40": '40',
+        "50": '50',
+    },
+}
+
+# Post-processing to add extended/copied classes
+COPY_CLASSES = [
+    ["backgroundColor", "colors"],
+    ["backgroundOpacity", "opacity"],
+    ["borderColor", "colors"],
+    ["borderOpacity", "opacity"],
+    ["borderSpacing", "spacing"],
+    ["boxShadowColor", "colors"],
+    ["caretColor", "colors"],
+    ["divideColor", "borderColor"],
+    ["divideOpacity", "borderOpacity"],
+    ["divideWidth", "borderWidth"],
+    ["gap", "spacing"],
+    ["gradientColorStops", "colors"],
+    ["inset", "spacing"],
+    ["outlineColor", "colors"],
+    ["padding", "spacing"],
+    ["placeholderColor", "colors"],
+    ["placeholderOpacity", "opacity"],
+    ["ringOffsetColor", "colors"],
+    ["scrollMargin", "spacing"],
+    ["scrollPadding", "spacing"],
+    ["space", "spacing"],
+    ["textColor", "colors"],
+    ["textDecorationColor", "colors"],
+    ["textIndent", "spacing"],
+    ["textOpacity", "opacity"],
+]
+
+EXTEND_CLASSES = [
+    ["flexBasis", "spacing"],
+    ["margin", "spacing"],
+    ["maxHeight", "spacing"],
+    ["maxWidth", "spacing"],
+    ["minHeight", "spacing"],
+    ["minWidth", "spacing"],
+    ["ringColor", "colors"],
+    ["ringOpacity", "opacity"],
+    ["stroke", "colors"],
+    ["translate", "spacing"],
+    ["size", "spacing"],
+    ["width", "spacing"],
+    ["accentColor", "colors"],
+    ["height", "spacing"],
+]
+
+for c1, c2 in EXTEND_CLASSES:
+    if c1 in CLASSES and c2 in CLASSES:
+        CLASSES[c1].update(CLASSES[c2])
+    elif c1 in CLASSES and c2 == "colors":
+         CLASSES[c1].update(COLORS)
+    elif c1 in CLASSES and c2 == "spacing":
+         CLASSES[c1].update(SPACING)
+    elif c1 in CLASSES and c2 == "opacity":
+        # Opacity is already in CLASSES, but might be defined differently
+        # For now assume it's in CLASSES
+        if "opacity" in CLASSES:
+             CLASSES[c1].update(CLASSES["opacity"])
+
+for c1, c2 in COPY_CLASSES:
+    if c2 == "colors":
+        CLASSES[c1] = COLORS
+    elif c2 == "spacing":
+        CLASSES[c1] = SPACING
+    elif c2 == "opacity":
+        if "opacity" in CLASSES:
+             CLASSES[c1] = CLASSES["opacity"]
+    elif c2 in CLASSES:
+        CLASSES[c1] = CLASSES[c2]
+
+# Gradient logic pre-computation
+CLASSES["from"] = {}
+CLASSES["to"] = {}
+CLASSES["via"] = {}
+CLASSES["fromPosition"] = {}
+CLASSES["toPosition"] = {}
+CLASSES["viaPosition"] = {}
+
+for color in COLORS:
+    val = COLORS[color]
+    if isinstance(val, str):
+        CLASSES["from"][color] = f"""--tw-gradient-from: {val} var(--tw-gradient-from-position);--tw-gradient-to: {val + "00" if val.startswith('#') else val} var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);"""
+        CLASSES["via"][color] = f"""--tw-gradient-to: {val + "00" if val.startswith('#') else val}  var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), {val} var(--tw-gradient-via-position), var(--tw-gradient-to);"""
+        CLASSES["to"][color] = f"""--tw-gradient-to: {val} var(--tw-gradient-to-position);"""
+        continue
+    clr_nos = val
+    for clr_no in clr_nos:
+        val = COLORS[color][clr_no]
+        if color not in CLASSES['from']:
+            CLASSES["from"][color] = {}
+            CLASSES["to"][color] = {}
+            CLASSES["via"][color] = {}
+        CLASSES["from"][color][clr_no] = f"""--tw-gradient-from: {val} var(--tw-gradient-from-position);--tw-gradient-to: {val + "00" if val.startswith('#') else val} var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);"""
+        CLASSES["via"][color][clr_no] = f"""--tw-gradient-to: {val + "00" if val.startswith('#') else val}  var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), {val} var(--tw-gradient-via-position), var(--tw-gradient-to);"""
+        CLASSES["to"][color][clr_no] = f"""--tw-gradient-to: {val} var(--tw-gradient-to-position);"""
+
+for i in range(0, 101, 5):
+    CLASSES["fromPosition"][str(i)] = f"{i}%"
+    CLASSES["fromPosition"][str(i) + "%"] = f"{i}%"
+    CLASSES["viaPosition"][str(i)] = f"{i}%"
+    CLASSES["viaPosition"][str(i) + "%"] = f"{i}%"
+    CLASSES["toPosition"][str(i)] = f"{i}%"
+    CLASSES["toPosition"][str(i) + "%"] = f"{i}%"
+
+DYNAMIC_VALUE = {
+    "text": "color",
+    "w": "width",
+    "h": "height",
+    "z": "zIndex",
+    "py": "paddingTopBottom",
+    "px": "paddingLeftRight",
+    "m": "margin",
+    "mt": "marginTop",
+    "mr": "marginRight",
+    "mb": "marginBottom",
+    "ml": "marginLeft",
+    "mx": "marginLeftRight",
+    "my": "marginTopBottom",
+    "p": "padding",
+    "pt": "paddingTop",
+    "pr": "paddingRight",
+    "pb": "paddingBottom",
+    "pl": "paddingLeft",
+    "leading": "lineHeight",
+    "tracking": "letterSpacing",
+    "bg": "backgroundColor",
+    "border": "borderColor",
+    "rounded": "borderRadius",
+    "shadow": "boxShadow",
+    "basis": "flexBasis",
+    "grid-cols": "gridTemplateColumns",
+    "grid-rows": "gridTemplateRows",
+    "order": "order",
+    "duration": "transitionDuration",
+    "delay": "transitionDelay",
+    "ease": "transitionTimingFunction",
+    "rotate": "rotate",
+    "scale": "scale",
+    "translate-x": "translateX",
+    "translate-y": "translateY",
+    "skew-x": "skewX",
+    "skew-y": "skewY",
+}
+
+for i, j in [["m", "margin"], ["p", "padding"]]:
+    for x, y in [["t", "top"], ["r", "right"], ["l", "left"], ["b", "bottom"]]:
+        CLASSES[j + y.capitalize()] = CLASSES[j]
+        DYNAMIC_VALUE[i + x] = j + "-" + y
+
+MULTI_REQUIREMENT = {
+    "marginLeftRight": ["marginRight"],
+    "marginTopBottom": ["marginBottom"],
+    "paddingLeftRight": ["paddingRight"],
+    "paddingTopBottom": ["paddingBottom"],
+    "rounded": ["borderTopLeftRadius", "borderTopRightRadius", "borderBottomRightRadius",
+                "borderBottomLeftRadius"],
+    "roundedTop": ["borderTopLeftRadius", "borderTopRightRadius"],
+    "roundedRight": ["borderTopRightRadius", "borderBottomRightRadius"],
+    "roundedBottom": ["borderBottomLeftRadius", "borderBottomRightRadius"],
+    "roundedLeft": ["borderTopLeftRadius", "borderBottomLeftRadius"],
+    "roundedTopLeft": ["borderTopLeftRadius"],
+    "roundedTopRight": ["borderTopRightRadius"],
+    "roundedBottomRight": ["borderBottomRightRadius"],
+    "roundedBottomLeft": ["borderBottomLeftRadius"],
+    "border": ["borderWidth"],
+    "itemsCenter": ["alignItems"],
+    "justifyCenter": ["justifyContent"],
+    "contentCenter": ["alignContent"],
+    "placeContentCenter": ["alignContent", "justifyContent"],
+    "gridCols": ["gridTemplateColumns"],
+    "gridRows": ["gridTemplateRows"],
+    "text": ["color"],
+    "font": ["fontFamily"],
+    "leading": ["lineHeight"],
+}
+
+for i, j in MULTI_REQUIREMENT.items():
+    CLASSES[i] = {}
+    if "margin" in CLASSES:
+        for key in CLASSES["margin"]:
+            value = CLASSES["margin"][key]
+            for k in j:
+                CLASSES[i][key] = [value, {k: value}]
+

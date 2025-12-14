@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pytailwind"
+version = "0.0.3"
+description = "A tailwind parser written completely in python without js dependency (unofficial)"
+readme = "readme.md"
+authors = [
+  { name = "shashstormer", email = "shashanka5398@gmail.com" },
+]
+license = { text = "MIT License" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = []
+
+[project.urls]
+GitHub = "https://github.com/shashstormer/pytailwindcss"
+
+[project.optional-dependencies]
+watch = ["watchdog"]
+
+[project.scripts]
+pytailwind = "pytailwind.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["pytailwind*"]
