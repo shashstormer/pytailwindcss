@@ -50,7 +50,7 @@ class Tailwind:
         classes_list = []
         result_css = {}
         for i in class_list:
-            i = i.split(" ")
+            i = i.split()
             for j in i:
                 if j not in classes_list:
                     classes_list.append(j)
@@ -65,16 +65,17 @@ class Tailwind:
                     i = ori_op[0]
                     opacity_text = f"/{opacity}"
                 except Exception as e:
+                    i = ori_op[0]
                     opacity = 100
             else:
                 opacity = 100
-            j = i.split("-")
             processors = []
-            if ":" in j[0]:
-                k = j[0].split(":")
-                j[0] = k[-1]
+            if ":" in i:
+                k = i.split(":")
+                i = k[-1]
                 k.pop()
                 processors = k
+            j = i.split("-")
             jz = self.merge_first_term(j)
             for j2, j3 in jz:
                 j = [j2]
@@ -90,6 +91,8 @@ class Tailwind:
                         if res:
                             gp_res = gp
                     if len(j) == 2:
+                        # DEBUG
+                        print(f"DEBUG LINE 90: gp={gp} j={j}")
                         if gp == "filter":
                             if "filter" not in j:
                                 j.insert(0, "filter")
@@ -192,8 +195,9 @@ class Tailwind:
             "2xl",  # min-width: 1536px
             "print",  # applies to print media
             "dark",  # prefers-color-scheme: dark
+            "light",  # prefers-color-scheme: light
             "motion-safe",  # prefers-reduced-motion: no-preference
-            "motion-reduce"  # prefers-reduced-motion: reduce
+            "motion-reduce",  # prefers-reduced-motion: reduce
             "max-sm",
             "max-md",
             "max-lg",
@@ -218,8 +222,6 @@ class Tailwind:
             "checked",  # :checked
             "required",  # :required
             "invalid",  # :invalid
-            "before",  # ::before
-            "after",  # ::after
             "first-of-type",  # :first-of-type
             "last-of-type",  # :last-of-type
             "only-child",  # :only-child
@@ -382,7 +384,7 @@ class Tailwind:
             elif processor == "peer-placeholder-shown":
                 result = result.split(" {", 1)
                 fin = ".peer:placeholder-shown ~ " + result[0] + " {" + result[1]
-            elif processor in ["sm", "md", "lg", "xl", "2xl"]:
+            elif processor in ["sm", "md", "lg", "xl", "2xl", "xs", "max-xs", "max-sm", "max-md", "max-lg", "max-xl", "max-2xl"]:
                 media_queries = {
                     "xs": "(min-width: 425px)",
                     "sm": "(min-width: 640px)",
