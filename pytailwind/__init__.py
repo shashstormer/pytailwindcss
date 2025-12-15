@@ -91,8 +91,6 @@ class Tailwind:
                         if res:
                             gp_res = gp
                     if len(j) == 2:
-                        # DEBUG
-                        print(f"DEBUG LINE 90: gp={gp} j={j}")
                         if gp == "filter":
                             if "filter" not in j:
                                 j.insert(0, "filter")
