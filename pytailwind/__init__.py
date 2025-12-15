@@ -1,16 +1,247 @@
 import re
+import copy
 from .classes import CLASSES, DYNAMIC_VALUE, MULTI_REQUIREMENT
 from .defaults import COLORS, SPACING
 from .conversions import  TO_CSS_NAME, TO_TAILWIND_NAME
 class Tailwind:
-    def __init__(self):
-        self.colors = COLORS
-        self.spacing = SPACING
-        self.classes = CLASSES
-        self.to_css_name = TO_CSS_NAME
-        self.dynamic_value = DYNAMIC_VALUE
-        self.to_tailwind_name = TO_TAILWIND_NAME
-        self.multi_requirement = MULTI_REQUIREMENT
+    def __init__(self, config=None):
+        self.colors = copy.deepcopy(COLORS)
+        self.spacing = copy.deepcopy(SPACING)
+        self.classes = copy.deepcopy(CLASSES)
+        self.to_css_name = copy.deepcopy(TO_CSS_NAME)
+        self.dynamic_value = copy.deepcopy(DYNAMIC_VALUE)
+        self.to_tailwind_name = copy.deepcopy(TO_TAILWIND_NAME)
+        self.multi_requirement = copy.deepcopy(MULTI_REQUIREMENT)
+
+        # Initialize media queries dictionary
+        self.media_queries = {
+            "xs": "(min-width: 425px)",
+            "sm": "(min-width: 640px)",
+            "md": "(min-width: 768px)",
+            "lg": "(min-width: 1024px)",
+            "xl": "(min-width: 1280px)",
+            "2xl": "(min-width: 1536px)",
+            "max-xs": "(max-width: 425px)",
+            "max-sm": "(max-width: 640px)",
+            "max-md": "(max-width: 768px)",
+            "max-lg": "(max-width: 1024px)",
+            "max-xl": "(max-width: 1280px)",
+            "max-2xl": "(max-width: 1536px)",
+        }
+
+        # List of Media Query Processors
+        # Will be re-generated based on media_queries
+        self.media_query_processors = [
+            "sm", "md", "lg", "xl", "2xl",
+            "print", "dark", "light", "motion-safe", "motion-reduce",
+            "max-sm", "max-md", "max-lg", "max-xl", "max-2xl"
+        ]
+
+        # List of Pseudo-class Processors
+        self.pseudo_class_processors = [
+            "hover",  # :hover
+            "focus",  # :focus
+            "active",  # :active
+            "visited",  # :visited
+            "first",  # :first-child
+            "last",  # :last-child
+            "odd",  # :nth-child(odd)
+            "even",  # :nth-child(even)
+            "disabled",  # :disabled
+            "group-hover",  # .group:hover .element
+            "focus-within",  # :focus-within
+            "focus-visible",  # :focus-visible
+            "checked",  # :checked
+            "required",  # :required
+            "invalid",  # :invalid
+            "first-of-type",  # :first-of-type
+            "last-of-type",  # :last-of-type
+            "only-child",  # :only-child
+            "only-of-type",  # :only-of-type
+            "empty",  # :empty
+            "read-only",  # :read-only
+            "placeholder-shown",  # :placeholder-shown
+            "not-first",  # :not(:first-child)
+            "not-last",  # :not(:last-child)
+            "not-disabled",  # :not(:disabled)
+            "not-checked",  # :not(:checked)
+            "not-odd",  # :not(:nth-child(odd))
+            "not-even",  # :not(:nth-child(even))
+            "peer-hover",  # :hover on a sibling with the class 'peer'
+            "peer-focus",  # :focus on a sibling with the class 'peer'
+            "peer-active",  # :active on a sibling with the class 'peer'
+            "peer-checked",  # :checked on a sibling with the class 'peer'
+            "peer-required",  # :required on a sibling with the class 'peer'
+            "peer-invalid",  # :invalid on a sibling with the class 'peer'
+            "peer-placeholder-shown",  # :placeholder-shown on a sibling with the class 'peer'
+        ]
+
+        # List of Pseudo-element Processors
+        self.pseudo_element_processors = [
+            "before",  # ::before
+            "after",  # ::after
+            "first-letter",  # ::first-letter
+            "first-line",  # ::first-line
+            "marker",  # ::marker
+            "selection",  # ::selection
+            "backdrop",  # ::backdrop
+            "placeholder"  # ::placeholder
+        ]
+
+        if config:
+            self.apply_config(config)
+
+    def apply_config(self, config):
+        theme = config.get("theme", {})
+        extend = theme.get("extend", {})
+
+        replace_colors = "colors" in theme
+
+        # Colors
+        if replace_colors:
+            self.colors = theme["colors"]
+
+        if "colors" in extend:
+             self._recursive_update(self.colors, extend["colors"])
+
+        # Spacing
+        if "spacing" in theme:
+            self.spacing = theme["spacing"]
+
+        if "spacing" in extend:
+            self._recursive_update(self.spacing, extend["spacing"])
+
+        # Screens
+        if "screens" in theme:
+            self._update_screens(theme["screens"], replace=True)
+
+        if "screens" in extend:
+             self._update_screens(extend["screens"], replace=False)
+
+        # Re-sync and Sort media_query_processors
+        # Get all keys from self.media_queries
+        screens = list(self.media_queries.keys())
+
+        # Helper to extract pixel value for sorting
+        def get_width_value(screen_name):
+            # Try to get pixel value from media query string
+            # e.g. "(min-width: 640px)" -> 640
+            mq = self.media_queries.get(screen_name, "")
+            match = re.search(r'width:\s*(\d+)px', mq)
+            if match:
+                return int(match.group(1))
+            return 999999 # Fallback for non-pixel or complex queries
+
+        # Separate min and max queries if needed, or just sort all by width
+        # Tailwind usually sorts min-width queries ascending.
+        # Max-width queries (if any) usually go after or before?
+        # Let's sort all known screens by width.
+        # But we also have non-screen processors like 'print', 'dark' etc.
+
+        # Existing non-screen processors:
+        others = ["print", "dark", "light", "motion-safe", "motion-reduce"]
+
+        # Identify screens (keys in media_queries)
+        # Note: media_queries includes 'max-sm' which I generated.
+
+        sorted_screens = sorted(screens, key=get_width_value)
+
+        self.media_query_processors = sorted_screens + others
+
+        self._update_classes_with_config(replace_colors=replace_colors)
+
+    def _update_classes_with_config(self, replace_colors=False):
+        # Groups that use colors (keys in self.classes)
+        # Based on CLASSES keys in classes.py
+        color_groups = [
+            "backgroundColor", "textColor", "borderColor", "divideColor", "ringColor",
+            "placeholderColor", "ringOffsetColor", "textDecorationColor", "accentColor",
+            "caretColor", "fill", "stroke", "outlineColor", "boxShadowColor",
+            "from", "via", "to", "gradientColorStops"
+        ]
+
+        # Groups that use spacing (keys in self.classes)
+        spacing_groups = [
+            "padding", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft",
+            "paddingLeftRight", "paddingTopBottom",
+            "margin", "marginTop", "marginRight", "marginBottom", "marginLeft",
+            "marginLeftRight", "marginTopBottom",
+            "width", "height", "minWidth", "minHeight", "maxWidth", "maxHeight",
+            "gap", "space", "inset", "translate",
+            "scrollMargin", "scrollPadding", "textIndent", "borderSpacing",
+            "top", "right", "bottom", "left", "flexBasis", "size"
+        ]
+
+        if replace_colors:
+            # Remove default colors from color_groups
+            for gp in color_groups:
+                if gp in self.classes:
+                    target = self.classes[gp]
+                    # We want to remove keys that are in default COLORS
+                    # Iterate over default COLORS to remove them
+                    for color_name in COLORS:
+                        if color_name in target:
+                            del target[color_name]
+
+        # Update Colors
+        for gp in color_groups:
+            self._merge_colors_into_group(gp)
+
+        # Update Spacing
+        for gp in spacing_groups:
+            if gp in self.classes:
+                target = self.classes[gp]
+                for k, v in self.spacing.items():
+                    target[k] = v
+
+    def _merge_colors_into_group(self, gp):
+         if gp not in self.classes:
+             return
+
+         target = self.classes[gp]
+
+         for color_name, color_value in self.colors.items():
+             if isinstance(color_value, dict):
+                 if color_name not in target:
+                     target[color_name] = {}
+                 if isinstance(target[color_name], dict):
+                     for shade, hex_val in color_value.items():
+                         target[color_name][shade] = hex_val
+             else:
+                 # If color_value is string
+                 target[color_name] = color_value
+
+
+    def _recursive_update(self, d, u):
+        for k, v in u.items():
+            if isinstance(v, dict):
+                d[k] = self._recursive_update(d.get(k, {}), v)
+            else:
+                d[k] = v
+        return d
+
+    def _update_screens(self, screens, replace=False):
+        if replace:
+            # Clear existing media queries
+            # But we should be careful if we want to keep non-screen things?
+            # self.media_queries ONLY contains screens (sm, md, etc).
+            # So clearing it is safe if we are replacing screens.
+            self.media_queries = {}
+
+        for name, value in screens.items():
+            width = value
+            if isinstance(value, dict):
+                width = value.get("min", "")
+
+            if width:
+                self.media_queries[name] = f"(min-width: {width})"
+                # Also generate max- variant?
+                # Standard Tailwind behavior for theme.screens:
+                # If you define screens, they are used for min-width breakpoints.
+                # It doesn't automatically generate max-width variants unless configured?
+                # But pytailwind seems to rely on them.
+                # I'll keep generating them to maintain feature parity with defaults.
+                self.media_queries[f"max-{name}"] = f"(max-width: {width})"
 
     def _tailwind_gps_matched(self, first):
         matches = []
@@ -167,8 +398,7 @@ class Tailwind:
             css_class = css_class.replace(_hex, char1 + rgba)
         return css_class
 
-    @staticmethod
-    def hex_to_rgb(hex_color):
+    def hex_to_rgb(self, hex_color):
         hex_color = hex_color.lstrip('#')
         if len(hex_color) == 3:
             hex_color = ''.join([c * 2 for c in hex_color])
@@ -181,84 +411,14 @@ class Tailwind:
             a = 1.0
         return [r, g, b, a]
 
-    @staticmethod
-    def process_result_value(result, processors):
+    def process_result_value(self, result, processors):
         fin = ""
-        # List of Media Query Processors
-        media_query_processors = [
-            "sm",  # min-width: 640px
-            "md",  # min-width: 768px
-            "lg",  # min-width: 1024px
-            "xl",  # min-width: 1280px
-            "2xl",  # min-width: 1536px
-            "print",  # applies to print media
-            "dark",  # prefers-color-scheme: dark
-            "light",  # prefers-color-scheme: light
-            "motion-safe",  # prefers-reduced-motion: no-preference
-            "motion-reduce",  # prefers-reduced-motion: reduce
-            "max-sm",
-            "max-md",
-            "max-lg",
-            "max-xl",
-            "max-2xl",
-        ]
-
-        # List of Pseudo-class Processors
-        pseudo_class_processors = [
-            "hover",  # :hover
-            "focus",  # :focus
-            "active",  # :active
-            "visited",  # :visited
-            "first",  # :first-child
-            "last",  # :last-child
-            "odd",  # :nth-child(odd)
-            "even",  # :nth-child(even)
-            "disabled",  # :disabled
-            "group-hover",  # .group:hover .element
-            "focus-within",  # :focus-within
-            "focus-visible",  # :focus-visible
-            "checked",  # :checked
-            "required",  # :required
-            "invalid",  # :invalid
-            "first-of-type",  # :first-of-type
-            "last-of-type",  # :last-of-type
-            "only-child",  # :only-child
-            "only-of-type",  # :only-of-type
-            "empty",  # :empty
-            "read-only",  # :read-only
-            "placeholder-shown",  # :placeholder-shown
-            "not-first",  # :not(:first-child)
-            "not-last",  # :not(:last-child)
-            "not-disabled",  # :not(:disabled)
-            "not-checked",  # :not(:checked)
-            "not-odd",  # :not(:nth-child(odd))
-            "not-even",  # :not(:nth-child(even))
-            "peer-hover",  # :hover on a sibling with the class 'peer'
-            "peer-focus",  # :focus on a sibling with the class 'peer'
-            "peer-active",  # :active on a sibling with the class 'peer'
-            "peer-checked",  # :checked on a sibling with the class 'peer'
-            "peer-required",  # :required on a sibling with the class 'peer'
-            "peer-invalid",  # :invalid on a sibling with the class 'peer'
-            "peer-placeholder-shown",  # :placeholder-shown on a sibling with the class 'peer'
-        ]
-
-        # List of Pseudo-element Processors
-        pseudo_element_processors = [
-            "before",  # ::before
-            "after",  # ::after
-            "first-letter",  # ::first-letter
-            "first-line",  # ::first-line
-            "marker",  # ::marker
-            "selection",  # ::selection
-            "backdrop",  # ::backdrop
-            "placeholder"  # ::placeholder
-        ]
 
         # Order processors
         ordered_processors_list = []
-        ordered_processors_list.extend(pseudo_element_processors)
-        ordered_processors_list.extend(pseudo_class_processors)
-        ordered_processors_list.extend(media_query_processors)
+        ordered_processors_list.extend(self.pseudo_element_processors)
+        ordered_processors_list.extend(self.pseudo_class_processors)
+        ordered_processors_list.extend(self.media_query_processors)
 
         processors_ordered = []
         for processor in ordered_processors_list:
@@ -382,22 +542,8 @@ class Tailwind:
             elif processor == "peer-placeholder-shown":
                 result = result.split(" {", 1)
                 fin = ".peer:placeholder-shown ~ " + result[0] + " {" + result[1]
-            elif processor in ["sm", "md", "lg", "xl", "2xl", "xs", "max-xs", "max-sm", "max-md", "max-lg", "max-xl", "max-2xl"]:
-                media_queries = {
-                    "xs": "(min-width: 425px)",
-                    "sm": "(min-width: 640px)",
-                    "md": "(min-width: 768px)",
-                    "lg": "(min-width: 1024px)",
-                    "xl": "(min-width: 1280px)",
-                    "2xl": "(min-width: 1536px)",
-                    "max-xs": "(max-width: 425px)",
-                    "max-sm": "(max-width: 640px)",
-                    "max-md": "(max-width: 768px)",
-                    "max-lg": "(max-width: 1024px)",
-                    "max-xl": "(max-width: 1280px)",
-                    "max-2xl": "(max-width: 1536px)",
-                }
-                fin = "@media %s {%s}" % (media_queries[processor], result)
+            elif processor in self.media_queries:
+                fin = "@media %s {%s}" % (self.media_queries[processor], result)
             elif processor == "motion-safe":
                 fin = "@media (prefers-reduced-motion: no-preference) {%s}" % result
             elif processor == "motion-reduce":
