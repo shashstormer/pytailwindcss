@@ -14,20 +14,7 @@ def main():
     parser.add_argument("-c", "--config", help="Path to config file (Python dictionary)")
 
     args = parser.parse_args()
-
-    # Load config if provided
-    config = None
-    if args.config:
-        import importlib.util
-        spec = importlib.util.spec_from_file_location("config", args.config)
-        config_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(config_module)
-        if hasattr(config_module, "config"):
-            config = config_module.config
-        else:
-            print(f"Warning: Config file {args.config} does not define a 'config' variable.")
-
-    tailwind = Tailwind(config)
+    tailwind = Tailwind()
 
     def generate_css():
         content = ""
@@ -41,7 +28,7 @@ def main():
             with open(args.input, "r") as f:
                 content = f.read()
 
-        css = tailwind.generate(content, minify=args.minify)
+        css = tailwind.generate(content)
 
         with open(args.output, "w") as f:
             f.write(css)
