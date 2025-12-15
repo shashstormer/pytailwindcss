@@ -276,7 +276,7 @@ class Tailwind:
         return lis
 
     def generate(self, page_content):
-        match_classes = re.compile('class\s*=\s*["\']([^"\']+)["\']')
+        match_classes = re.compile(r'class\s*=\s*["\']([^"\']+)["\']')
         class_list = match_classes.findall(page_content)
         classes_list = []
         result_css = {}
