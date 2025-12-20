@@ -2,8 +2,35 @@ import re
 import copy
 from .classes import CLASSES, DYNAMIC_VALUE, MULTI_REQUIREMENT
 from .defaults import COLORS, SPACING
-from .conversions import  TO_CSS_NAME, TO_TAILWIND_NAME
+from .conversions import TO_CSS_NAME, TO_TAILWIND_NAME
+from .utils import extract_candidates, split_classes, split_by_hyphen, replace_underscores_safe
+
+
 class Tailwind:
+    # Define groups for validation
+    COLOR_GROUPS = {
+        "backgroundColor", "textColor", "borderColor", "divideColor", "ringColor",
+        "placeholderColor", "ringOffsetColor", "textDecorationColor", "accentColor",
+        "caretColor", "fill", "stroke", "outlineColor", "boxShadowColor",
+        "from", "via", "to", "gradientColorStops"
+    }
+
+    SPACING_GROUPS = {
+        "padding", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft",
+        "paddingLeftRight", "paddingTopBottom",
+        "margin", "marginTop", "marginRight", "marginBottom", "marginLeft",
+        "marginLeftRight", "marginTopBottom",
+        "width", "height", "minWidth", "minHeight", "maxWidth", "maxHeight",
+        "gap", "space", "inset", "translate",
+        "scrollMargin", "scrollPadding", "textIndent", "borderSpacing",
+        "top", "right", "bottom", "left", "flexBasis", "size",
+        "borderWidth", "divideWidth", "ringWidth", "ringOffsetWidth", "outlineWidth",
+        "strokeWidth", "textDecorationThickness"
+    }
+
+    # Groups that accept images
+    IMAGE_GROUPS = {"backgroundImage", "listStyleImage", "content"}
+
     def __init__(self, config=None):
         self.colors = copy.deepcopy(COLORS)
         self.spacing = copy.deepcopy(SPACING)
@@ -102,7 +129,7 @@ class Tailwind:
             self.colors = theme["colors"]
 
         if "colors" in extend:
-             self._recursive_update(self.colors, extend["colors"])
+            self._recursive_update(self.colors, extend["colors"])
 
         # Spacing
         if "spacing" in theme:
@@ -116,7 +143,7 @@ class Tailwind:
             self._update_screens(theme["screens"], replace=True)
 
         if "screens" in extend:
-             self._update_screens(extend["screens"], replace=False)
+            self._update_screens(extend["screens"], replace=False)
 
         # Re-sync and Sort media_query_processors
         # Get all keys from self.media_queries
@@ -130,7 +157,7 @@ class Tailwind:
             match = re.search(r'width:\s*(\d+)px', mq)
             if match:
                 return int(match.group(1))
-            return 999999 # Fallback for non-pixel or complex queries
+            return 999999  # Fallback for non-pixel or complex queries
 
         # Separate min and max queries if needed, or just sort all by width
         # Tailwind usually sorts min-width queries ascending.
@@ -151,30 +178,9 @@ class Tailwind:
         self._update_classes_with_config(replace_colors=replace_colors)
 
     def _update_classes_with_config(self, replace_colors=False):
-        # Groups that use colors (keys in self.classes)
-        # Based on CLASSES keys in classes.py
-        color_groups = [
-            "backgroundColor", "textColor", "borderColor", "divideColor", "ringColor",
-            "placeholderColor", "ringOffsetColor", "textDecorationColor", "accentColor",
-            "caretColor", "fill", "stroke", "outlineColor", "boxShadowColor",
-            "from", "via", "to", "gradientColorStops"
-        ]
-
-        # Groups that use spacing (keys in self.classes)
-        spacing_groups = [
-            "padding", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft",
-            "paddingLeftRight", "paddingTopBottom",
-            "margin", "marginTop", "marginRight", "marginBottom", "marginLeft",
-            "marginLeftRight", "marginTopBottom",
-            "width", "height", "minWidth", "minHeight", "maxWidth", "maxHeight",
-            "gap", "space", "inset", "translate",
-            "scrollMargin", "scrollPadding", "textIndent", "borderSpacing",
-            "top", "right", "bottom", "left", "flexBasis", "size"
-        ]
-
         if replace_colors:
             # Remove default colors from color_groups
-            for gp in color_groups:
+            for gp in self.COLOR_GROUPS:
                 if gp in self.classes:
                     target = self.classes[gp]
                     # We want to remove keys that are in default COLORS
@@ -184,33 +190,32 @@ class Tailwind:
                             del target[color_name]
 
         # Update Colors
-        for gp in color_groups:
+        for gp in self.COLOR_GROUPS:
             self._merge_colors_into_group(gp)
 
         # Update Spacing
-        for gp in spacing_groups:
+        for gp in self.SPACING_GROUPS:
             if gp in self.classes:
                 target = self.classes[gp]
                 for k, v in self.spacing.items():
                     target[k] = v
 
     def _merge_colors_into_group(self, gp):
-         if gp not in self.classes:
-             return
+        if gp not in self.classes:
+            return
 
-         target = self.classes[gp]
+        target = self.classes[gp]
 
-         for color_name, color_value in self.colors.items():
-             if isinstance(color_value, dict):
-                 if color_name not in target:
-                     target[color_name] = {}
-                 if isinstance(target[color_name], dict):
-                     for shade, hex_val in color_value.items():
-                         target[color_name][shade] = hex_val
-             else:
-                 # If color_value is string
-                 target[color_name] = color_value
-
+        for color_name, color_value in self.colors.items():
+            if isinstance(color_value, dict):
+                if color_name not in target:
+                    target[color_name] = {}
+                if isinstance(target[color_name], dict):
+                    for shade, hex_val in color_value.items():
+                        target[color_name][shade] = hex_val
+            else:
+                # If color_value is string
+                target[color_name] = color_value
 
     def _recursive_update(self, d, u):
         for k, v in u.items():
@@ -275,16 +280,152 @@ class Tailwind:
                 lis.append(i)
         return lis
 
+    def resolve_theme(self, value):
+        """
+        Resolves theme('...') inside arbitrary values.
+        """
+        match = re.match(r"theme\(['\"](.+?)['\"]\)", value)
+        if not match:
+            return value
+
+        path = match.group(1).split('.')
+
+        # Traverse configuration to find the value
+        # Start with a virtual root combining colors, spacing, screens?
+        # Standard Tailwind theme() can access any key in the theme.
+        # But here we have flattened colors and spacing into self.colors, self.spacing etc.
+        # But we also applied config so we might have new things.
+        # Ideally we should keep 'theme' object structure.
+        # But 'self.colors' contains the merged colors.
+
+        # Map common top-level keys to self attributes
+        current = None
+
+        root_key = path[0]
+        if root_key == 'colors':
+            current = self.colors
+        elif root_key == 'spacing':
+            current = self.spacing
+        elif root_key == 'screens':
+            # self.media_queries stores complete strings, not just widths
+            # But theme('screens.sm') should return the width e.g. '640px'
+            # We don't easily have the width map if we only stored media queries.
+            # But users usually ask for colors or spacing.
+            pass
+        else:
+            # Fallback or other keys like 'fontFamily' which are in self.classes but scattered?
+            # Actually, `self.classes` keys are mapped from `TO_TAILWIND_NAME`.
+            # e.g. theme('fontFamily.sans') -> self.classes['fontFamily']['sans']?
+            # Let's check if we can look into self.classes using TO_TAILWIND_NAME reverse mapping?
+            # Or TO_CSS_NAME?
+            # If root_key is 'fontSize', self.classes['fontSize'] exists.
+
+            # Let's try to find it in self.classes
+            if root_key in self.classes:
+                current = self.classes[root_key]
+
+        if current is None:
+            # Try to map root_key via TO_TAILWIND_NAME?
+            # e.g. theme('margin.4') -> margin is in spacing.
+            # But usually theme() uses keys like 'colors', 'spacing', 'fontFamily'.
+            pass
+
+        # Traverse the rest of the path
+        if current:
+            for key in path[1:]:
+                if isinstance(current, dict) and key in current:
+                    current = current[key]
+                else:
+                    return value  # Failed to resolve
+
+            if isinstance(current, (str, int, float)):
+                return str(current)
+            elif isinstance(current, list):
+                # e.g. fontSize can be list [size, lineHeight]
+                return str(current[0])
+
+        return value
+
+    @staticmethod
+    def looks_like_color(value):
+        if not value: return False
+        if value.startswith("#") or value.startswith("rgb") or value.startswith("hsl"):
+            return True
+        if value in ["transparent", "inherit", "currentColor", "white", "black"]:
+            return True
+        return False
+
+    @staticmethod
+    def looks_like_url(value):
+        return "url(" in value
+
+    def validate_arbitrary_value(self, group, value):
+        """
+        Returns True if value is valid for the group.
+        """
+        is_color = self.looks_like_color(value)
+        is_url = self.looks_like_url(value)
+
+        if group in self.COLOR_GROUPS:
+            return is_color
+
+        if group in self.IMAGE_GROUPS:
+            return is_url or "gradient" in value or value == "none"
+
+        if group in self.SPACING_GROUPS:
+            # Spacing should not be color or url usually
+            if is_color or is_url: return False
+            return True
+
+        if group == "backgroundPosition":
+            # Avoid colors and urls
+            if is_color or is_url: return False
+            return True
+
+        if group == "backgroundSize":
+            if is_color or is_url: return False
+            return True
+
+        if group == "fontSize":
+            if is_color: return False
+            return True
+
+        if group == "boxShadow":
+            # Shadow can contain color but it's complex string
+            # e.g. "0 10px 15px -3px rgba(0, 0, 0, 0.1)"
+            # It starts with length usually.
+            if value.startswith("#"): return False  # pure color is likely boxShadowColor
+            return True
+
+        if group in ["textAlign", "verticalAlign", "textTransform", "textWrap", "fontStyle", "fontSmoothing"]:
+            # Keywords only usually. Definitely not color or url.
+            if is_color or is_url: return False
+            # Also usually not length?
+            if any(u in value for u in ["px", "rem", "em", "%", "vh", "vw"]):
+                return False
+            return True
+
+        # Default allow if we don't know constraints?
+        return True
+
     def generate(self, page_content):
-        match_classes = re.compile(r'class\s*=\s*["\']([^"\']+)["\']')
-        class_list = match_classes.findall(page_content)
+        # Improved candidate extraction
+        candidates = extract_candidates(page_content)
+
+        # Split candidates into class tokens
         classes_list = []
+        seen = set()
+
+        for candidate in candidates:
+            tokens = split_classes(candidate)
+            for token in tokens:
+                if token not in seen:
+                    classes_list.append(token)
+                    seen.add(token)
+
+        # Original generation logic
         result_css = {}
-        for i in class_list:
-            i = i.split()
-            for j in i:
-                if j not in classes_list:
-                    classes_list.append(j)
+
         for i in classes_list:
             ori_i = i
             opacity = i.split("/", 1)
@@ -306,21 +447,33 @@ class Tailwind:
                 i = k[-1]
                 k.pop()
                 processors = k
-            j = i.split("-")
+
+            # Use split_by_hyphen instead of i.split("-")
+            j = split_by_hyphen(i)
+
             jz = self.merge_first_term(j)
+
+            best_match = None
+
             for j2, j3 in jz:
+                if best_match: break
+
                 j = [j2]
                 j.extend(j3)
                 gps = self._tailwind_gps_matched(j[0])
+
                 for gp in gps:
                     res = ""
                     gp_res = ""
+                    is_arbitrary = False
+
                     if len(j) == 1:
                         res = self.classes[gp].get(j[0], "")
                         if not res:
                             res = self.classes[gp].get("DEFAULT", "")
                         if res:
                             gp_res = gp
+
                     if len(j) == 2:
                         if gp == "filter":
                             if "filter" not in j:
@@ -328,36 +481,108 @@ class Tailwind:
                         res = self.classes[gp].get(j[1], "")
                         if isinstance(res, dict):
                             res = res.get("DEFAULT", "")
+
                         if j[-1].startswith("["):
-                            gp_res = self.dynamic_value.get(j[0], "")
-                            if gp_res:
-                                res = j[-1].replace("[", "").replace("]", "")
-                                if gp_res in self.multi_requirement:
-                                    res = [res]
-                                    for z in self.multi_requirement[gp_res]:
-                                        res.append({z: res[0]})
+                            is_arbitrary = True
+
+                            # Extract value
+                            raw_val = j[-1].replace("[", "").replace("]", "")
+                            raw_val = replace_underscores_safe(raw_val)  # Safer replace
+                            raw_val = self.resolve_theme(raw_val)
+
+                            # Validate
+                            if self.validate_arbitrary_value(gp, raw_val):
+                                res = raw_val
+                                gp_res = gp
+
+                                # Handle multi-requirement (e.g. padding x/y)
+                                if gp in self.multi_requirement:
+                                    res_list = [res]
+                                    for z in self.multi_requirement[gp]:
+                                        res_list.append({z: res})
+                                    res = res_list
                             else:
-                                if not res:
-                                    res = j[-1].replace("[", "").replace("]", "")
-                        if res:
-                            gp_res = gp
+                                res = ""  # Invalid for this group
+                        else:
+                            if res:
+                                gp_res = gp
+
+                    # Sequential checks for length updates (e.g. filter insertion above)
                     if len(j) == 3:
-                        res = self.classes[gp].get(j[1], {}).get(j[2], "")
+                        # Fix for crash: use safe check before calling .get()
+                        val = self.classes[gp].get(j[1], {})
+                        if isinstance(val, dict):
+                            res = val.get(j[2], "")
+                        else:
+                            res = ""
+
                         if j[-1].startswith("["):
-                            if not res:
-                                res = j[-1].replace("[", "").replace("]", "")
+                            # Path validation: Ensure intermediate keys exist if we are nested
+                            # e.g. text-red-[...] -> red must exist in classes[gp]
+                            root = self.classes[gp]
+                            path_valid = False
+                            if isinstance(root, dict) and j[1] in root:
+                                path_valid = True
+
+                            if path_valid:
+                                is_arbitrary = True
+                                raw_val = j[-1].replace("[", "").replace("]", "")
+                                raw_val = replace_underscores_safe(raw_val)
+                                raw_val = self.resolve_theme(raw_val)
+
+                                if self.validate_arbitrary_value(gp, raw_val):
+                                    res = raw_val
+                                    gp_res = gp
+
+                                    # Handle Divide/Border structural generation
+                                    if gp == "divideWidth" or gp == "borderWidth":
+                                        axis = j[1]
+                                        if axis == "x":
+                                            res = [{"border-left-width": raw_val, "border-right-width": raw_val}]
+                                        elif axis == "y":
+                                            res = [{"border-top-width": raw_val, "border-bottom-width": raw_val}]
+                                else:
+                                    res = ""
+                            else:
+                                res = ""  # Path invalid, skip arbitrary check
+
                         if res:
                             gp_res = gp
+
                     if len(j) == 4:
                         res = self.classes[gp].get(j[1], {}).get(j[2], {}).get(j[3], "")
                         if j[-1].startswith("["):
-                            if not res:
-                                res = j[-1].replace("[", "").replace("]", "")
+                            # Path validation
+                            root = self.classes[gp]
+                            path_valid = False
+                            if isinstance(root, dict) and j[1] in root:
+                                sub = root[j[1]]
+                                if isinstance(sub, dict) and j[2] in sub:
+                                    path_valid = True
+
+                            if path_valid:
+                                is_arbitrary = True
+                                raw_val = j[-1].replace("[", "").replace("]", "")
+                                raw_val = replace_underscores_safe(raw_val)
+                                raw_val = self.resolve_theme(raw_val)
+
+                                if self.validate_arbitrary_value(gp, raw_val):
+                                    res = raw_val
+                                    gp_res = gp
+                                else:
+                                    res = ""
+                            else:
+                                res = ""
+
                         if res:
                             gp_res = gp
-                    if res:
+
+                    if res and gp_res:
+                        # We found a valid match.
+
+                        # Generate CSS string
                         if (isinstance(res, str) or (isinstance(res, list) and isinstance(res[0], str))) and gp not in [
-                                "from", "to", "via"]:
+                            "from", "to", "via"]:
                             result_css_to_add = (".%s {%s: %s;}" %
                                                  (
                                                      self.sanitize_class_name(ori_i),
@@ -368,10 +593,17 @@ class Tailwind:
                         else:
                             result_css_to_add = ".%s {%s}" % (
                                 self.sanitize_class_name(ori_i), self.normalize_property_value(res))
+
                         result_css_to_add = self.process_result_value(result_css_to_add, processors)
                         if opacity < 100:
                             result_css_to_add = self.process_opacity(result_css_to_add, opacity)
-                        result_css[self.sanitize_class_name(ori_i)] = result_css_to_add
+
+                        best_match = result_css_to_add
+                        break  # Found valid gp match
+
+            if best_match:
+                result_css[self.sanitize_class_name(ori_i)] = best_match
+
         from_vals = [result_css[k] for k in result_css if "from-" in k]
         via_vals = [result_css[k] for k in result_css if "via-" in k]
         to_vals = [result_css[k] for k in result_css if "to-" in k]
@@ -563,7 +795,8 @@ class Tailwind:
     def sanitize_class_name(name):
         name = (name.replace("[", "\\[").replace("]", "\\]").replace("%", "\\%").replace(":", "\\:")
                 .replace("/", "\\/").replace("(", "\\(").replace(")", "\\)").replace("#", "\\#").replace(",", "\\,"))
-        if name.startswith("space-x") or name.startswith("space-y"):
+        if name.startswith("space-x") or name.startswith("space-y") or name.startswith("divide-x") or name.startswith(
+                "divide-y"):
             name += " > * + *"
         return name
 

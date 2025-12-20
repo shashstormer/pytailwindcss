@@ -12,16 +12,21 @@ def main():
     parser.add_argument("-w", "--watch", action="store_true", help="Watch for changes")
     parser.add_argument("-m", "--minify", action="store_true", help="Minify output CSS")
     parser.add_argument("-c", "--config", help="Path to config file (Python dictionary)")
-
+    parser.add_argument("-j", "--javascript", action="store_true", help="Search JavaScript files also for Tailwind classes")
     args = parser.parse_args()
-    tailwind = Tailwind()
-
+    tailwind = Tailwind(config=args.config if args.config else None)
+    def include_file(filename):
+        if filename.endswith(".html") or filename.endswith(".pypx"):
+            return True
+        if args.javascript:
+            return filename.endswith(".js")
+        return False
     def generate_css():
         content = ""
         if os.path.isdir(args.input):
             for root, dirs, files in os.walk(args.input):
                 for file in files:
-                    if file.endswith(".html"):
+                    if include_file(file):  # I originally made this for pypx so adding that, otherwise works for other users also
                         with open(os.path.join(root, file), "r") as f:
                             content += f.read()
         else:
@@ -43,6 +48,7 @@ def main():
         except ImportError:
             print("watchdog module not found. Please install it with `pip install watchdog`")
             sys.exit(1)
+            return
 
         class Handler(FileSystemEventHandler):
             def on_modified(self, event):
