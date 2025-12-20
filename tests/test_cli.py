@@ -15,7 +15,8 @@ def test_cli_no_args(capsys):
             pass
     captured = capsys.readouterr()
     assert "error" in captured.err
-    os.remove("output.css")
+    if os.path.exists("output.css"):
+        os.remove("output.css")
 
 def test_cli_generate_file(tmp_path):
     input_file = tmp_path / "index.html"

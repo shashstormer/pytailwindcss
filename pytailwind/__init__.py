@@ -377,13 +377,14 @@ class Tailwind:
             if is_color or is_url: return False
             return True
 
-        if group == "backgroundPosition":
-            # Avoid colors and urls
+        if group in ["backgroundPosition", "backgroundSize", "backgroundRepeat", "backgroundClip"]:
             if is_color or is_url: return False
             return True
 
-        if group == "backgroundSize":
+        if group in ["borderCollapse", "borderStyle"]:
             if is_color or is_url: return False
+            if any(u in value for u in ["px", "rem", "em", "%", "vh", "vw"]): return False
+            if value[0].isdigit(): return False
             return True
 
         if group == "fontSize":
@@ -514,7 +515,9 @@ class Tailwind:
                         if isinstance(val, dict):
                             res = val.get(j[2], "")
                         else:
-                            res = ""
+                            # Try combining keys (e.g. bg-left-bottom -> left-bottom)
+                            combined_key = f"{j[1]}-{j[2]}"
+                            res = self.classes[gp].get(combined_key, "")
 
                         if j[-1].startswith("["):
                             # Path validation: Ensure intermediate keys exist if we are nested

@@ -4,6 +4,59 @@ CLASSES = {
             "accentColor": {
                 "auto": 'auto',
             },
+            "alignContent": {
+                "center": "center",
+                "start": "flex-start",
+                "end": "flex-end",
+                "between": "space-between",
+                "around": "space-around",
+                "evenly": "space-evenly",
+                "baseline": "baseline",
+                "stretch": "stretch",
+            },
+            "alignItems": {
+                "start": "flex-start",
+                "end": "flex-end",
+                "center": "center",
+                "baseline": "baseline",
+                "stretch": "stretch",
+            },
+            "alignSelf": {
+                "auto": "auto",
+                "start": "flex-start",
+                "end": "flex-end",
+                "center": "center",
+                "stretch": "stretch",
+                "baseline": "baseline",
+            },
+            "backgroundClip": {
+                "border": "border-box",
+                "padding": "padding-box",
+                "content": "content-box",
+                "text": "text",
+            },
+            "backgroundRepeat": {
+                "repeat": "repeat",
+                "no-repeat": "no-repeat",
+                "repeat-x": "repeat-x",
+                "repeat-y": "repeat-y",
+                "round": "round",
+                "space": "space",
+                "repeat-round": "round",
+                "repeat-space": "space",
+            },
+            "borderCollapse": {
+                "collapse": "collapse",
+                "separate": "separate",
+            },
+            "borderStyle": {
+                "solid": "solid",
+                "dashed": "dashed",
+                "dotted": "dotted",
+                "double": "double",
+                "hidden": "hidden",
+                "none": "none",
+            },
             "animationNames": {
                 "none": 'none',
                 "spin": 'spin 1s linear var(--tw-animation-count, infinite)',
@@ -256,6 +309,7 @@ CLASSES = {
 
             },
             "boxShadow": {
+                "xs": '0 0 0 1px rgba(0, 0, 0, 0.05)',
                 "sm": '0 1px 2px 0 rgb(0 0 0 / 0.05)',
                 "DEFAULT": '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
                 "md": '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
@@ -264,6 +318,20 @@ CLASSES = {
                 '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
                 "inner": 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
                 "none": 'none',
+            },
+            "boxDecorationBreak": {
+                "slice": "slice",
+                "clone": "clone",
+            },
+            "boxSizing": {
+                "border": "border-box",
+                "content": "content-box",
+            },
+            "clear": {
+                "left": "left",
+                "right": "right",
+                "both": "both",
+                "none": "none",
             },
             "brightness": {
                 "0": '0',
@@ -459,6 +527,22 @@ CLASSES = {
                 "initial": '0 1 auto',
                 "none": 'none',
             },
+            "flexDirection": {
+                "row": "row",
+                "row-reverse": "row-reverse",
+                "col": "column",
+                "col-reverse": "column-reverse",
+            },
+            "flexWrap": {
+                "wrap": "wrap",
+                "wrap-reverse": "wrap-reverse",
+                "nowrap": "nowrap",
+            },
+            "float": {
+                "right": "right",
+                "left": "left",
+                "none": "none",
+            },
             "flexBasis": {
                 "auto": 'auto',
                 '1/2': '50%',
@@ -518,6 +602,17 @@ CLASSES = {
                     '"Courier New"',
                     'monospace',
                 ],
+            },
+            "fontVariantNumeric": {
+                "normal-nums": "normal",
+                "ordinal": "ordinal",
+                "slashed-zero": "slashed-zero",
+                "lining-nums": "lining-nums",
+                "oldstyle-nums": "oldstyle-nums",
+                "proportional-nums": "proportional-nums",
+                "tabular-nums": "tabular-nums",
+                "diagonal-fractions": "diagonal-fractions",
+                "stacked-fractions": "stacked-fractions",
             },
             "fontSize": {
                 "xs": ['0.75rem', {"lineHeight": '1rem'}],
@@ -775,6 +870,31 @@ CLASSES = {
                 "0": '0',
                 "DEFAULT": '100%',
             },
+            "isolation": {
+                "isolate": "isolate",
+                "auto": "auto",
+            },
+            "justifyContent": {
+                "start": "flex-start",
+                "end": "flex-end",
+                "center": "center",
+                "between": "space-between",
+                "around": "space-around",
+                "evenly": "space-evenly",
+            },
+            "justifyItems": {
+                "start": "start",
+                "end": "end",
+                "center": "center",
+                "stretch": "stretch",
+            },
+            "justifySelf": {
+                "auto": "auto",
+                "start": "start",
+                "end": "end",
+                "center": "center",
+                "stretch": "stretch",
+            },
             "keyframes": {
                 "spin": {
                     "to": {
@@ -910,6 +1030,31 @@ CLASSES = {
                 "max": 'max-content',
                 "fit": 'fit-content',
             },
+            "mixBlendMode": {
+                "normal": "normal",
+                "multiply": "multiply",
+                "screen": "screen",
+                "overlay": "overlay",
+                "darken": "darken",
+                "lighten": "lighten",
+                "color-dodge": "color-dodge",
+                "color-burn": "color-burn",
+                "hard-light": "hard-light",
+                "soft-light": "soft-light",
+                "difference": "difference",
+                "exclusion": "exclusion",
+                "hue": "hue",
+                "saturation": "saturation",
+                "color": "color",
+                "luminosity": "luminosity",
+            },
+            "objectFit": {
+                "contain": "contain",
+                "cover": "cover",
+                "fill": "fill",
+                "none": "none",
+                "scale-down": "scale-down",
+            },
             "objectPosition": {
                 "bottom": 'bottom',
                 "center": 'center',
@@ -982,6 +1127,21 @@ CLASSES = {
                     "scroll": "scroll"
                 }
             },
+            "overscrollBehavior": {
+                "auto": "auto",
+                "contain": "contain",
+                "none": "none",
+                "y": {
+                    "auto": "auto",
+                    "contain": "contain",
+                    "none": "none",
+                },
+                "x": {
+                    "auto": "auto",
+                    "contain": "contain",
+                    "none": "none",
+                }
+            },
             "outlineOffset": {
                 "0": '0px',
                 "1": '1px',
@@ -1002,6 +1162,30 @@ CLASSES = {
                 'absolute': 'absolute',
                 'fixed': 'fixed',
                 'sticky': 'sticky'
+            },
+            "placeContent": {
+                "center": "center",
+                "start": "start",
+                "end": "end",
+                "between": "space-between",
+                "around": "space-around",
+                "evenly": "space-evenly",
+                "baseline": "baseline",
+                "stretch": "stretch",
+            },
+            "placeItems": {
+                "center": "center",
+                "start": "start",
+                "end": "end",
+                "baseline": "baseline",
+                "stretch": "stretch",
+            },
+            "placeSelf": {
+                "auto": "auto",
+                "center": "center",
+                "start": "start",
+                "end": "end",
+                "stretch": "stretch",
             },
             "ringColor": {
                 "DEFAULT": '#3b82f6'  # theme('colors.blue.500', '#3b82f6'),
@@ -1137,6 +1321,10 @@ CLASSES = {
             },
             "supports": {},
             "data": {},
+            "tableLayout": {
+                "auto": "auto",
+                "fixed": "fixed",
+            },
             "textAlign": {
                 "left": "left",  # Align text to the left
                 "right": "right",  # Align text to the right
@@ -1180,6 +1368,11 @@ CLASSES = {
                 "2": '2px',
                 "4": '4px',
                 "8": '8px',
+            },
+            "transform": {
+                "none": "none",
+                "DEFAULT": "translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))",
+                "gpu": "translate3d(var(--tw-translate-x), var(--tw-translate-y), 0) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))",
             },
             "transformOrigin": {
                 "center": 'center',
@@ -1252,6 +1445,16 @@ CLASSES = {
                 "in": 'cubic-bezier(0.4, 0, 1, 1)',
                 "out": 'cubic-bezier(0, 0, 0.2, 1)',
                 'in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
+            },
+            "verticalAlign": {
+                "baseline": "baseline",
+                "top": "top",
+                "middle": "middle",
+                "bottom": "bottom",
+                "text-top": "text-top",
+                "text-bottom": "text-bottom",
+                "sub": "sub",
+                "super": "super",
             },
             "translate": {
                 '1/2': '50%',
@@ -1361,6 +1564,7 @@ COPY_CLASSES = [
             ["divideColor", "borderColor"],
             ["divideOpacity", "borderOpacity"],
             ["divideWidth", "borderWidth"],
+            ["divideStyle", "borderStyle"],
             ["gap", "spacing"],
             ["gradientColorStops", "colors"],
             ["inset", "spacing"],
