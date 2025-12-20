@@ -794,7 +794,7 @@ class Tailwind:
     @staticmethod
     def sanitize_class_name(name):
         name = (name.replace("[", "\\[").replace("]", "\\]").replace("%", "\\%").replace(":", "\\:")
-                .replace("/", "\\/").replace("(", "\\(").replace(")", "\\)").replace("#", "\\#").replace(",", "\\,"))
+                .replace("/", "\\/").replace("(", "\\(").replace(")", "\\)").replace("#", "\\#").replace(",", "\\,")).replace(".", "\\.")
         if name.startswith("space-x") or name.startswith("space-y") or name.startswith("divide-x") or name.startswith(
                 "divide-y"):
             name += " > * + *"
