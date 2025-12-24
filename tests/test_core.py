@@ -4,7 +4,7 @@ from pytailwind.defaults import COLORS, SPACING
 
 @pytest.fixture
 def tw():
-    return Tailwind()
+    return Tailwind(include_preflight=False)
 
 # Tests for internal methods removed - those methods no longer exist in the new architecture
 # The new generator uses plugins and AST for a cleaner implementation

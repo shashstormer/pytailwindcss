@@ -11,6 +11,7 @@ from .classes import CLASSES, DYNAMIC_VALUE, MULTI_REQUIREMENT
 from .defaults import COLORS, SPACING
 from .conversions import TO_CSS_NAME, TO_TAILWIND_NAME
 from .utils import extract_candidates, split_classes
+from .preflight import get_preflight, get_preflight_layered, PREFLIGHT_CSS
 
 # Core architecture imports
 from .parser import ClassParser, TailwindToken, ValueType
@@ -52,13 +53,15 @@ class Tailwind:
     # Groups that accept images
     IMAGE_GROUPS = {"backgroundImage", "listStyleImage", "content"}
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, include_preflight=True):
         """
         Initialize the Tailwind generator.
         
         Args:
             config: Optional configuration dictionary for customizing colors,
                    spacing, screens, etc.
+            include_preflight: Whether to include Preflight base styles when
+                              generating CSS. Defaults to True.
         """
         self.colors = copy.deepcopy(COLORS)
         self.spacing = copy.deepcopy(SPACING)
@@ -70,6 +73,9 @@ class Tailwind:
         
         # Lazy-initialized generator
         self._generator = None
+        
+        # Preflight configuration
+        self.include_preflight = include_preflight
         
         # Dark mode configuration
         # Options:
@@ -272,12 +278,14 @@ class Tailwind:
             )
         return self._generator
 
-    def generate(self, page_content: str) -> str:
+    def generate(self, page_content: str, include_preflight: bool = None) -> str:
         """
         Generate CSS from page content containing Tailwind classes.
         
         Args:
             page_content: HTML/JSX/template content containing Tailwind classes
+            include_preflight: Override instance-level preflight setting.
+                              If None, uses the instance setting.
             
         Returns:
             Generated CSS string
@@ -288,9 +296,41 @@ class Tailwind:
             >>> print(css)
             .p-4 {padding: 1rem;}.text-red-500 {color: #ef4444;}
         """
-        return self.generator.generate(page_content)
+        # Determine whether to include preflight
+        should_include_preflight = include_preflight if include_preflight is not None else self.include_preflight
+        
+        # Generate utility CSS
+        utility_css = self.generator.generate(page_content)
+        
+        # Prepend preflight if enabled and there are utilities
+        if should_include_preflight and utility_css:
+            return get_preflight() + "\n" + utility_css
+        elif should_include_preflight:
+            return get_preflight()
+        
+        return utility_css
 
     # ========== Utility Methods ==========
+
+    def get_preflight(self, layered: bool = False) -> str:
+        """
+        Get the Preflight base styles CSS.
+        
+        Args:
+            layered: If True, wraps the CSS in @layer base.
+            
+        Returns:
+            The Preflight CSS string.
+            
+        Example:
+            >>> tw = Tailwind()
+            >>> css = tw.get_preflight()
+            >>> 'box-sizing: border-box' in css
+            True
+        """
+        if layered:
+            return get_preflight_layered()
+        return get_preflight()
 
     def get_parser(self) -> ClassParser:
         """Get a class parser instance for external use."""
@@ -337,8 +377,8 @@ class Tailwind:
         """
         declarations = []
         for class_name in classes:
-            # Generate CSS for this class
-            css = self.generate(f'<div class="{class_name}"></div>')
+            # Generate CSS for this class (without preflight)
+            css = self.generate(f'<div class="{class_name}"></div>', include_preflight=False)
             if css:
                 # Extract declarations from the generated rule
                 # Format: .class-name {declarations}

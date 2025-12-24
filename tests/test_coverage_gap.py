@@ -9,7 +9,7 @@ from pytailwind import Tailwind
 
 @pytest.fixture
 def tw():
-    return Tailwind()
+    return Tailwind(include_preflight=False)
 
 
 def test_filter_auto_insert(tw):
