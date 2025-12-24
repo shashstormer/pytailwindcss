@@ -5,6 +5,11 @@ from .defaults import COLORS, SPACING
 from .conversions import TO_CSS_NAME, TO_TAILWIND_NAME
 from .utils import extract_candidates, split_classes, split_by_hyphen, replace_underscores_safe
 
+# New architecture imports
+from .parser import ClassParser, TailwindToken, ValueType
+from .ast import Stylesheet, Rule, Selector, Declaration, MediaQuery, escape_css_class
+from .generator import CSSGenerator, create_generator
+
 
 class Tailwind:
     # Define groups for validation
@@ -31,7 +36,7 @@ class Tailwind:
     # Groups that accept images
     IMAGE_GROUPS = {"backgroundImage", "listStyleImage", "content"}
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, use_new_generator=True):
         self.colors = copy.deepcopy(COLORS)
         self.spacing = copy.deepcopy(SPACING)
         self.classes = copy.deepcopy(CLASSES)
@@ -39,6 +44,10 @@ class Tailwind:
         self.dynamic_value = copy.deepcopy(DYNAMIC_VALUE)
         self.to_tailwind_name = copy.deepcopy(TO_TAILWIND_NAME)
         self.multi_requirement = copy.deepcopy(MULTI_REQUIREMENT)
+        
+        # Flag to use the new plugin-based generator
+        self.use_new_generator = use_new_generator
+        self._generator = None  # Lazy-initialized
 
         # Initialize media queries dictionary
         self.media_queries = {
@@ -410,6 +419,10 @@ class Tailwind:
         return True
 
     def generate(self, page_content):
+        # Use new plugin-based generator if enabled
+        if self.use_new_generator:
+            return self._generate_new(page_content)
+        
         # Improved candidate extraction
         candidates = extract_candidates(page_content)
 
@@ -826,3 +839,54 @@ class Tailwind:
         else:
             result = value
         return result
+
+    # ========== New Plugin-Based Generator ==========
+    
+    @property
+    def generator(self) -> CSSGenerator:
+        """
+        Get the new plugin-based CSS generator.
+        
+        Lazily initializes the generator on first access.
+        """
+        if self._generator is None:
+            self._generator = create_generator(
+                colors=self.colors,
+                spacing=self.spacing,
+                classes=self.classes,
+                media_queries=self.media_queries,
+            )
+        return self._generator
+    
+    def _generate_new(self, page_content: str) -> str:
+        """
+        Generate CSS using the new plugin-based architecture.
+        
+        This method uses the modular parser, AST, and plugin system
+        for more maintainable and extensible CSS generation.
+        
+        Args:
+            page_content: HTML/template content containing Tailwind classes
+            
+        Returns:
+            Generated CSS string
+        """
+        return self.generator.generate(page_content)
+    
+    def get_parser(self) -> ClassParser:
+        """Get a class parser instance for external use."""
+        return ClassParser()
+    
+    def parse_class(self, class_string: str) -> TailwindToken:
+        """
+        Parse a single Tailwind class string into a token.
+        
+        Useful for debugging or custom processing.
+        
+        Args:
+            class_string: A Tailwind class like "hover:bg-red-500/50"
+            
+        Returns:
+            Parsed TailwindToken with extracted components
+        """
+        return ClassParser().parse(class_string)
