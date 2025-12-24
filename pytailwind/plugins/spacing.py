@@ -43,6 +43,35 @@ FRACTIONAL_VALUES = {
     '11/12': '91.666667%',
 }
 
+CONTAINER_SCALES = {
+    '3xs': 'var(--container-3xs, 16rem)',
+    '2xs': 'var(--container-2xs, 18rem)',
+    'xs': 'var(--container-xs, 20rem)',
+    'sm': 'var(--container-sm, 24rem)',
+    'md': 'var(--container-md, 28rem)',
+    'lg': 'var(--container-lg, 32rem)',
+    'xl': 'var(--container-xl, 36rem)',
+    '2xl': 'var(--container-2xl, 42rem)',
+    '3xl': 'var(--container-3xl, 48rem)',
+    '4xl': 'var(--container-4xl, 56rem)',
+    '5xl': 'var(--container-5xl, 64rem)',
+    '6xl': 'var(--container-6xl, 72rem)',
+    '7xl': 'var(--container-7xl, 80rem)',
+}
+
+VIEWPORT_SCALES = {
+    'screen': '100vw',
+    'svw': '100svw',
+    'lvw': '100lvw',
+    'dvw': '100dvw',
+}
+VIEWPORT_HEIGHT_SCALES = {
+    'screen': '100vh',
+    'svh': '100svh',
+    'lvh': '100lvh',
+    'dvh': '100dvh',
+}
+
 
 class WidthPlugin(UtilityPlugin):
     """Plugin for width utilities (w-*)."""
@@ -53,14 +82,16 @@ class WidthPlugin(UtilityPlugin):
     STATIC_VALUES = {
         'auto': 'auto',
         'full': '100%',
-        'screen': '100vw',
-        'svw': '100svw',
-        'lvw': '100lvw',
-        'dvw': '100dvw',
         'min': 'min-content',
         'max': 'max-content',
         'fit': 'fit-content',
         **FRACTIONAL_VALUES,
+        **CONTAINER_SCALES,
+        **VIEWPORT_SCALES,
+        # Vertical viewports for width too? Tailwind v4 docs say yes: w-svh is valid
+        'svh': '100svh',
+        'lvh': '100lvh',
+        'dvh': '100dvh',
     }
     
     @property
@@ -80,6 +111,11 @@ class WidthPlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+             
         if value is None:
             return None
         return self.create_rule(token, 'width', value)
@@ -94,14 +130,15 @@ class HeightPlugin(UtilityPlugin):
     STATIC_VALUES = {
         'auto': 'auto',
         'full': '100%',
-        'screen': '100vh',
-        'svh': '100svh',
-        'lvh': '100lvh',
-        'dvh': '100dvh',
         'min': 'min-content',
         'max': 'max-content',
         'fit': 'fit-content',
         **FRACTIONAL_VALUES,
+        **VIEWPORT_HEIGHT_SCALES,
+        # Horizontal viewports for height too
+        'svw': '100svw',
+        'lvw': '100lvw',
+        'dvw': '100dvw',
     }
     
     @property
@@ -121,6 +158,11 @@ class HeightPlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+
         if value is None:
             return None
         return self.create_rule(token, 'height', value)
@@ -139,6 +181,16 @@ class SizePlugin(UtilityPlugin):
         'max': 'max-content',
         'fit': 'fit-content',
         **FRACTIONAL_VALUES,
+        **CONTAINER_SCALES,
+        # Size supports all viewport units for both w/h (square)
+        'screen': '100vw', # Wait, size-screen is usually usually not typical or implies 100vw/100vh? 
+        # Tailwind v4 docs say: size-dvw -> width: 100dvw; height: 100dvw;
+        'svw': '100svw',
+        'lvw': '100lvw',
+        'dvw': '100dvw',
+        'svh': '100svh',
+        'lvh': '100lvh',
+        'dvh': '100dvh',
     }
     
     @property
@@ -158,6 +210,11 @@ class SizePlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+
         if value is None:
             return None
         return self.create_multi_rule(token, {'width': value, 'height': value})
@@ -175,6 +232,12 @@ class MinWidthPlugin(UtilityPlugin):
         'min': 'min-content',
         'max': 'max-content',
         'fit': 'fit-content',
+        **CONTAINER_SCALES,
+        **VIEWPORT_SCALES,
+        'svh': '100svh',
+        'lvh': '100lvh',
+        'dvh': '100dvh',
+        **FRACTIONAL_VALUES,
     }
     
     @property
@@ -194,6 +257,11 @@ class MinWidthPlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+
         if value is None:
             return None
         return self.create_rule(token, 'min-width', value)
@@ -208,17 +276,6 @@ class MaxWidthPlugin(UtilityPlugin):
     STATIC_VALUES = {
         '0': '0rem',
         'none': 'none',
-        'xs': '20rem',
-        'sm': '24rem',
-        'md': '28rem',
-        'lg': '32rem',
-        'xl': '36rem',
-        '2xl': '42rem',
-        '3xl': '48rem',
-        '4xl': '56rem',
-        '5xl': '64rem',
-        '6xl': '72rem',
-        '7xl': '80rem',
         'full': '100%',
         'min': 'min-content',
         'max': 'max-content',
@@ -229,6 +286,12 @@ class MaxWidthPlugin(UtilityPlugin):
         'screen-lg': '1024px',
         'screen-xl': '1280px',
         'screen-2xl': '1536px',
+        **CONTAINER_SCALES,
+        **VIEWPORT_SCALES,
+        'svh': '100svh',
+        'lvh': '100lvh',
+        'dvh': '100dvh',
+        **FRACTIONAL_VALUES,
     }
     
     @property
@@ -248,6 +311,11 @@ class MaxWidthPlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+
         if value is None:
             return None
         return self.create_rule(token, 'max-width', value)
@@ -262,13 +330,15 @@ class MinHeightPlugin(UtilityPlugin):
     STATIC_VALUES = {
         '0': '0px',
         'full': '100%',
-        'screen': '100vh',
-        'svh': '100svh',
-        'lvh': '100lvh',
-        'dvh': '100dvh',
         'min': 'min-content',
         'max': 'max-content',
         'fit': 'fit-content',
+        'lh': '1lh',
+        **VIEWPORT_HEIGHT_SCALES,
+        'svw': '100svw',
+        'lvw': '100lvw',
+        'dvw': '100dvw',
+        **FRACTIONAL_VALUES,
     }
     
     @property
@@ -288,6 +358,11 @@ class MinHeightPlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+
         if value is None:
             return None
         return self.create_rule(token, 'min-height', value)
@@ -303,13 +378,15 @@ class MaxHeightPlugin(UtilityPlugin):
         '0': '0px',
         'none': 'none',
         'full': '100%',
-        'screen': '100vh',
-        'svh': '100svh',
-        'lvh': '100lvh',
-        'dvh': '100dvh',
         'min': 'min-content',
         'max': 'max-content',
         'fit': 'fit-content',
+        'lh': '1lh',
+        **VIEWPORT_HEIGHT_SCALES,
+        'svw': '100svw',
+        'lvw': '100lvw',
+        'dvw': '100dvw',
+        **FRACTIONAL_VALUES,
     }
     
     @property
@@ -329,6 +406,11 @@ class MaxHeightPlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+
         if value is None:
             return None
         return self.create_rule(token, 'max-height', value)
