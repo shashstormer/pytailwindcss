@@ -83,12 +83,14 @@ class ClassParser:
         # Flexbox/Grid
         # Flexbox/Grid
         'basis', 'grow', 'shrink',
-        'gap', 'gap-x', 'gap-y',
+        'gap',
         'col',
         'row',
         'grid-cols', 'grid-rows', 'auto-cols', 'auto-rows',
         'grid-flow',
-        'justify', 'items', 'content', 'self', 'place',
+        'justify', 'justify-items', 'justify-self',
+        'items', 'content', 'self',
+        'place', 'place-content', 'place-items', 'place-self',
         # Typography
         'text', 'font', 'leading', 'tracking', 'indent',
         'align', 'whitespace', 'break', 'hyphens',
@@ -117,7 +119,7 @@ class ClassParser:
         'overscroll', 'scroll', 'snap', 'touch', 'select',
         'will-change', 'cursor', 'pointer-events', 'resize',
         'appearance', 'list', 'sr',
-        'space-x', 'space-y',
+        'space',
         # New Layout Utils
         'break-after', 'break-before', 'break-inside',
         'box', 'box-decoration',
@@ -306,7 +308,7 @@ class ClassParser:
             candidate = "-".join(parts[:length])
             if candidate in self.UTILITY_PREFIXES:
                 # Special Check for modifiers that get swallowed by prefix match
-                if candidate in ('inset', 'overscroll') and length < len(parts):
+                if candidate in ('inset', 'overscroll', 'gap', 'space') and length < len(parts):
                      next_part = parts[length]
                      if next_part in ('x', 'y'):
                           return candidate, next_part, length + 1

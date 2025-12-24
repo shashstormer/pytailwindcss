@@ -418,6 +418,11 @@ class JustifyContentPlugin(UtilityPlugin):
         'around': 'space-around',
         'evenly': 'space-evenly',
         'stretch': 'stretch',
+        'left': 'left',
+        'right': 'right',
+        'center-safe': 'safe center',
+        'start-safe': 'safe flex-start',
+        'end-safe': 'safe flex-end',
     }
     
     @property
@@ -428,11 +433,16 @@ class JustifyContentPlugin(UtilityPlugin):
         if token.utility != 'justify':
             return False
         # Don't match justify-items-* or justify-self-*
+        if token.value in ('items', 'self'):
+             return False
         return token.modifier is None
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         if token.value in self.STATIC_VALUES:
-            return self.create_rule(token, 'justify-content', self.STATIC_VALUES[token.value])
+            val = self.STATIC_VALUES[token.value]
+            # Handle safe modification manually if not in static map?
+            # e.g. justify-center-safe -> value="center-safe"
+            return self.create_rule(token, 'justify-content', val)
         return None
 
 
@@ -448,6 +458,10 @@ class AlignItemsPlugin(UtilityPlugin):
         'center': 'center',
         'baseline': 'baseline',
         'stretch': 'stretch',
+        'start-safe': 'safe flex-start',
+        'end-safe': 'safe flex-end',
+        'center-safe': 'safe center',
+        'baseline-safe': 'safe baseline',
     }
     
     @property
@@ -479,6 +493,9 @@ class AlignContentPlugin(UtilityPlugin):
         'evenly': 'space-evenly',
         'baseline': 'baseline',
         'stretch': 'stretch',
+        'center-safe': 'safe center',
+        'start-safe': 'safe flex-start',
+        'end-safe': 'safe flex-end',
     }
     
     def match(self, token: TailwindToken) -> bool:
@@ -505,6 +522,9 @@ class AlignSelfPlugin(UtilityPlugin):
         'center': 'center',
         'stretch': 'stretch',
         'baseline': 'baseline',
+        'center-safe': 'safe center',
+        'start-safe': 'safe flex-start',
+        'end-safe': 'safe flex-end',
     }
     
     @property
@@ -1443,6 +1463,130 @@ class GridAutoRowsPlugin(UtilityPlugin):
         return None
 
 
+class JustifyItemsPlugin(UtilityPlugin):
+    """Plugin for justify-items utilities (justify-items-*)."""
+    name = "justify-items"
+    prefixes = ["justify-items"]
+    
+    STATIC_VALUES = {
+        'start': 'start',
+        'end': 'end',
+        'center': 'center',
+        'stretch': 'stretch',
+        'normal': 'normal',
+        'center-safe': 'safe center',
+        'start-safe': 'safe start',
+        'end-safe': 'safe end',
+    }
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == 'justify-items'
+        
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        if token.value in self.STATIC_VALUES:
+            return self.create_rule(token, 'justify-items', self.STATIC_VALUES[token.value])
+        return None
+
+class JustifySelfPlugin(UtilityPlugin):
+    """Plugin for justify-self utilities (justify-self-*)."""
+    name = "justify-self"
+    prefixes = ["justify-self"]
+    
+    STATIC_VALUES = {
+        'auto': 'auto',
+        'start': 'start',
+        'end': 'end',
+        'center': 'center',
+        'stretch': 'stretch',
+        'center-safe': 'safe center',
+        'start-safe': 'safe start',
+        'end-safe': 'safe end',
+    }
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == 'justify-self'
+        
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        if token.value in self.STATIC_VALUES:
+            return self.create_rule(token, 'justify-self', self.STATIC_VALUES[token.value])
+        return None
+
+class PlaceContentPlugin(UtilityPlugin):
+    """Plugin for place-content utilities (place-content-*)."""
+    name = "place-content"
+    prefixes = ["place-content"]
+    
+    STATIC_VALUES = {
+        'center': 'center',
+        'start': 'start',
+        'end': 'end',
+        'between': 'space-between',
+        'around': 'space-around',
+        'evenly': 'space-evenly',
+        'baseline': 'baseline',
+        'stretch': 'stretch',
+        'center-safe': 'safe center',
+        'start-safe': 'safe start',
+        'end-safe': 'safe end',
+    }
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == 'place-content'
+        
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        if token.value in self.STATIC_VALUES:
+            return self.create_rule(token, 'place-content', self.STATIC_VALUES[token.value])
+        return None
+
+class PlaceItemsPlugin(UtilityPlugin):
+    """Plugin for place-items utilities (place-items-*)."""
+    name = "place-items"
+    prefixes = ["place-items"]
+    
+    STATIC_VALUES = {
+        'start': 'start',
+        'end': 'end',
+        'center': 'center',
+        'baseline': 'baseline',
+        'stretch': 'stretch',
+        'center-safe': 'safe center',
+        'start-safe': 'safe start',
+        'end-safe': 'safe end',
+    }
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == 'place-items'
+        
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        if token.value in self.STATIC_VALUES:
+            return self.create_rule(token, 'place-items', self.STATIC_VALUES[token.value])
+        return None
+
+class PlaceSelfPlugin(UtilityPlugin):
+    """Plugin for place-self utilities (place-self-*)."""
+    name = "place-self"
+    prefixes = ["place-self"]
+    
+    STATIC_VALUES = {
+        'auto': 'auto',
+        'start': 'start',
+        'end': 'end',
+        'center': 'center',
+        'stretch': 'stretch',
+        'center-safe': 'safe center',
+        'start-safe': 'safe start',
+        'end-safe': 'safe end',
+    }
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == 'place-self'
+        
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        if token.value in self.STATIC_VALUES:
+            return self.create_rule(token, 'place-self', self.STATIC_VALUES[token.value])
+        return None
+
+
 def get_plugins() -> List[UtilityPlugin]:
     """Get all layout-related plugins."""
     return [
@@ -1456,9 +1600,14 @@ def get_plugins() -> List[UtilityPlugin]:
         FlexShrinkPlugin(),
         FlexBasisPlugin(),
         JustifyContentPlugin(),
+        JustifyItemsPlugin(),
+        JustifySelfPlugin(),
         AlignItemsPlugin(),
         AlignContentPlugin(),
         AlignSelfPlugin(),
+        PlaceContentPlugin(),
+        PlaceItemsPlugin(),
+        PlaceSelfPlugin(),
         GridColumnsPlugin(),
         GridRowsPlugin(),
         GridColumnPlugin(),

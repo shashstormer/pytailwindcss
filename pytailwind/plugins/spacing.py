@@ -366,6 +366,11 @@ class PaddingPlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+
         if value is None:
             return None
         
@@ -420,6 +425,11 @@ class MarginPlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+
         if value is None:
             return None
         
@@ -451,6 +461,11 @@ class GapPlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+        
         if value is None:
             return None
         
@@ -486,20 +501,64 @@ class SpacePlugin(UtilityPlugin):
         return token.utility == 'space' and token.modifier in ('x', 'y')
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        # Check for reverse utility
+        if token.value == 'reverse':
+             modifier = token.modifier # x or y
+             prop = f"--tw-space-{modifier}-reverse"
+             return Rule(
+                 selector=Selector(
+                     base=f".{escape_css_class(token.raw)}",
+                     combinator_suffix="> :not([hidden]) ~ :not([hidden])"
+                 ),
+                 declarations=[Declaration(property=prop, value='1')]
+             )
+        
         value = self.resolve_value(token, context)
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+             
         if value is None:
             return None
         
-        # space-x/y uses the lobotomized owl selector: > * + *
+        # Space utilities use lobotomized owl: > :not([hidden]) ~ :not([hidden])
+        # And support RTL via calc logic
         selector = Selector(
             base=f".{escape_css_class(token.raw)}",
-            combinator_suffix="> * + *"
+            combinator_suffix="> :not([hidden]) ~ :not([hidden])"
         )
         
+        declarations = []
         if token.modifier == 'x':
-            declarations = [Declaration(property='margin-left', value=value)]
+            declarations.append(Declaration(property='--tw-space-x-reverse', value='0'))
+            # margin-inline-start: calc(value * var(--tw-space-x-reverse))
+            # margin-inline-end: calc(value * calc(1 - var(--tw-space-x-reverse)))
+            # But wait, logic is:
+            # margin-right: calc(value * 0) if normal LTR?
+            # Actually Tailwind v3/v4 logical props:
+            # margin-inline-start: calc(space * var(--tw-space-x-reverse))
+            # margin-inline-end: calc(space * calc(1 - var(--tw-space-x-reverse)))
+            
+            # If standard LTR, reverse=0 -> start=0, end=space.
+            # So element + element has margin-left (start) of 0? margin-right (end) of space?
+            # Standard space-x-4 puts margin-left on subsequent items in LTR.
+            # So margin-inline-start should be the space.
+            # If reverse=0: start = space * (1 - 0) = space. end = space * 0 = 0.
+            
+            val_calc_start = f"calc({value} * calc(1 - var(--tw-space-x-reverse)))"
+            val_calc_end = f"calc({value} * var(--tw-space-x-reverse))"
+            
+            declarations.append(Declaration(property='margin-inline-start', value=val_calc_start))
+            declarations.append(Declaration(property='margin-inline-end', value=val_calc_end))
+            
         else:  # y
-            declarations = [Declaration(property='margin-top', value=value)]
+            declarations.append(Declaration(property='--tw-space-y-reverse', value='0'))
+            val_calc_top = f"calc({value} * calc(1 - var(--tw-space-y-reverse)))"
+            val_calc_bottom = f"calc({value} * var(--tw-space-y-reverse))"
+            
+            declarations.append(Declaration(property='margin-top', value=val_calc_top))
+            declarations.append(Declaration(property='margin-bottom', value=val_calc_bottom))
         
         return Rule(selector=selector, declarations=declarations)
 
