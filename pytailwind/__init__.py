@@ -70,6 +70,15 @@ class Tailwind:
         
         # Lazy-initialized generator
         self._generator = None
+        
+        # Dark mode configuration
+        # Options:
+        #   - 'media' (default): Uses prefers-color-scheme media query
+        #   - 'class': Uses .dark class on parent element
+        #   - 'selector': Uses custom selector (e.g., '[data-theme=dark]')
+        # Can also be a tuple: ('selector', '.dark') or ('selector', '[data-theme=dark]')
+        self.dark_mode = 'media'
+        self.dark_mode_selector = '.dark'
 
         # Initialize media queries dictionary (Tailwind v4 syntax)
         self.media_queries = {
@@ -124,6 +133,21 @@ class Tailwind:
         """Apply a configuration dictionary to customize the generator."""
         theme = config.get("theme", {})
         extend = theme.get("extend", {})
+        
+        # Dark mode configuration
+        # Options:
+        #   - 'media': Uses prefers-color-scheme media query (default)
+        #   - 'class': Uses .dark class selector
+        #   - ('class', 'selector'): Uses custom selector e.g. ('class', '[data-theme=dark]')
+        if "darkMode" in config:
+            dark_mode = config["darkMode"]
+            if isinstance(dark_mode, str):
+                self.dark_mode = dark_mode
+                if dark_mode == 'class':
+                    self.dark_mode_selector = '.dark'
+            elif isinstance(dark_mode, (list, tuple)) and len(dark_mode) >= 2:
+                self.dark_mode = dark_mode[0]
+                self.dark_mode_selector = dark_mode[1]
 
         replace_colors = "colors" in theme
 
@@ -243,6 +267,8 @@ class Tailwind:
                 spacing=self.spacing,
                 classes=self.classes,
                 media_queries=self.media_queries,
+                dark_mode=self.dark_mode,
+                dark_mode_selector=self.dark_mode_selector,
             )
         return self._generator
 

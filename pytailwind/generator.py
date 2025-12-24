@@ -230,10 +230,18 @@ class CSSGenerator:
         spacing: Dict,
         classes: Dict,
         media_queries: Dict[str, str],
+        dark_mode: str = 'media',
+        dark_mode_selector: str = '.dark',
     ):
         self.parser = ClassParser()
         self.registry = PluginRegistry()
         self.media_queries = media_queries
+        
+        # Dark mode configuration
+        # 'media' = use prefers-color-scheme media query
+        # 'class' or 'selector' = use selector-based dark mode
+        self.dark_mode = dark_mode
+        self.dark_mode_selector = dark_mode_selector
         
         # Create generator context
         self.context = GeneratorContext(
@@ -362,9 +370,25 @@ class CSSGenerator:
             # Skip media/container query variants (handled separately)
             if variant in self.media_queries:
                 continue
-            if variant in self.MEDIA_FEATURE_VARIANTS:
-                continue
             if variant in self.CONTAINER_QUERIES:
+                continue
+            
+            # Handle dark/light based on dark mode config
+            if variant == 'dark':
+                if self.dark_mode == 'media':
+                    continue  # Handled as media query
+                else:
+                    # Class/selector-based dark mode
+                    combinator_prefix = f'{self.dark_mode_selector} ' if not self.dark_mode_selector.endswith(' ') else self.dark_mode_selector
+                    continue
+            if variant == 'light':
+                if self.dark_mode == 'media':
+                    continue  # Handled as media query
+                # For class-based, we could support a light selector too if configured
+                continue
+            
+            # Skip other media feature variants (handled as media queries)
+            if variant in self.MEDIA_FEATURE_VARIANTS:
                 continue
             
             # Handle arbitrary variants
@@ -485,8 +509,19 @@ class CSSGenerator:
             if variant in self.media_queries:
                 return self.media_queries[variant]
             
-            # Check media feature variants
-            if variant in self.MEDIA_FEATURE_VARIANTS:
+            # Handle dark/light variants based on configuration
+            if variant == 'dark':
+                if self.dark_mode == 'media':
+                    return self.MEDIA_FEATURE_VARIANTS['dark']
+                # For class/selector mode, dark is handled in _apply_variants
+                continue
+            if variant == 'light':
+                if self.dark_mode == 'media':
+                    return self.MEDIA_FEATURE_VARIANTS['light']
+                continue
+            
+            # Check other media feature variants (excluding dark/light handled above)
+            if variant in self.MEDIA_FEATURE_VARIANTS and variant not in ('dark', 'light'):
                 return self.MEDIA_FEATURE_VARIANTS[variant]
             
             # Handle arbitrary min-[...] and max-[...]
@@ -527,6 +562,8 @@ def create_generator(
     spacing: Dict,
     classes: Dict,
     media_queries: Dict[str, str],
+    dark_mode: str = 'media',
+    dark_mode_selector: str = '.dark',
 ) -> CSSGenerator:
     """
     Factory function to create a CSS generator.
@@ -536,6 +573,8 @@ def create_generator(
         spacing: Spacing scale dictionary
         classes: Static class mappings
         media_queries: Media query mappings
+        dark_mode: 'media' for prefers-color-scheme, 'class' or 'selector' for selector-based
+        dark_mode_selector: CSS selector for class/selector-based dark mode
         
     Returns:
         Configured CSSGenerator instance
@@ -545,4 +584,6 @@ def create_generator(
         spacing=spacing,
         classes=classes,
         media_queries=media_queries,
+        dark_mode=dark_mode,
+        dark_mode_selector=dark_mode_selector,
     )

@@ -393,3 +393,74 @@ class TestStateVariants:
         html = '<div class="inert:opacity-50"></div>'
         css = tw.generate(html)
         assert "inert" in css
+
+
+# ============================================================================
+# DARK MODE CONFIGURATION TESTS
+# ============================================================================
+
+class TestDarkModeConfiguration:
+    """Test dark mode configuration options."""
+    
+    def test_default_dark_mode_uses_media_query(self):
+        """Default dark mode should use prefers-color-scheme media query."""
+        tw = Tailwind()
+        css = tw.generate('<div class="dark:bg-gray-800"></div>')
+        assert "@media (prefers-color-scheme: dark)" in css
+        assert "background-color" in css
+    
+    def test_class_based_dark_mode(self):
+        """Class-based dark mode should use .dark selector."""
+        tw = Tailwind(config={'darkMode': 'class'})
+        css = tw.generate('<div class="dark:bg-gray-800"></div>')
+        assert ".dark" in css
+        assert "background-color" in css
+        assert "@media" not in css
+    
+    def test_selector_dark_mode(self):
+        """Selector mode should use 'selector' type."""
+        tw = Tailwind(config={'darkMode': 'selector'})
+        css = tw.generate('<div class="dark:text-white"></div>')
+        assert ".dark" in css
+        assert "color" in css
+        assert "@media" not in css
+    
+    def test_custom_dark_mode_selector(self):
+        """Custom selector like [data-theme=dark] should work."""
+        tw = Tailwind(config={'darkMode': ('selector', '[data-theme=dark]')})
+        css = tw.generate('<div class="dark:text-white"></div>')
+        assert "[data-theme=dark]" in css
+        assert "color" in css
+        assert "@media" not in css
+    
+    def test_custom_class_dark_mode(self):
+        """Custom class selector like .dark-mode should work."""
+        tw = Tailwind(config={'darkMode': ('class', '.dark-mode')})
+        css = tw.generate('<div class="dark:bg-black"></div>')
+        assert ".dark-mode" in css
+        assert "background-color" in css
+    
+    def test_dark_mode_with_hover(self):
+        """Dark mode should combine with other variants."""
+        tw = Tailwind()
+        css = tw.generate('<div class="dark:hover:text-white"></div>')
+        assert "@media (prefers-color-scheme: dark)" in css
+        assert ":hover" in css
+    
+    def test_class_dark_mode_with_hover(self):
+        """Class-based dark mode should combine with other variants."""
+        tw = Tailwind(config={'darkMode': 'class'})
+        css = tw.generate('<div class="dark:hover:text-white"></div>')
+        assert ".dark" in css
+        assert ":hover" in css
+
+
+class TestContainerUtility:
+    """Test @container utility class."""
+    
+    def test_container_utility(self):
+        """@container should set container-type: inline-size."""
+        tw = Tailwind()
+        css = tw.generate('<div class="@container"></div>')
+        assert "container-type: inline-size" in css
+
