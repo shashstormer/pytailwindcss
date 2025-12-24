@@ -47,9 +47,17 @@ with open("page.css", "wt") as f:
 
 # Features
 
-* Supports most [tailwind classes](https://tailwindcss.com/)
-* Supports Hover, Focus, and Other States refer [tailwind guidelines](https://tailwindcss.com/docs/hover-focus-and-other-states).
-* Most of existing tailwind classes can always be parsed using this library (some clases may be missed out please contact shashstormer or make a PR to this repo).
+**pyTailwindCSS** now supports a comprehensive set of **Tailwind CSS v4.1** features:
+
+- **Core Utilities**: Full support for Layout, Flexbox, Grid, Spacing, Sizing, Typography, Backgrounds, Borders, Effects, Filters, Tables, Transitions, and Transforms.
+- **Modern Theme System**: Complete implementation of v4 theme variables for colors, fonts, shadows, radii, and more.
+- **Arbitrary Values**: Support for JIT-style arbitrary values (e.g., `w-[123px]`, `bg-[#bada55]`) and properties (e.g., `[mask-type:luminance]`).
+- **Directives & Functions**: Support for `@apply`, `theme()`, and `--spacing()` via the Python API.
+- **Variants**: extensive support for responsive variants (`sm:`, `lg:`), pseudo-classes (`hover:`, `focus:`), and dark mode.
+- **Class Detection**: Intelligent extraction of classes from HTML, JSX, and template strings, including handling of complex whitespaces.
+- **Preflight**: Includes Tailwind's base reset styles (Preflight) by default.
+
+> **Note**: This is a high-level overview. For detailed usage, specific API references, and comprehensive examples, please refer to the **pytailwind v4.1 docs**.
 
 # Features to implement
 1. Config and extension of the default classes with .py config file.

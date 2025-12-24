@@ -579,7 +579,17 @@ class OrderPlugin(UtilityPlugin):
 
 
 class AspectRatioPlugin(UtilityPlugin):
-    """Plugin for aspect-ratio utilities (aspect-*)."""
+    """
+    Plugin for aspect-ratio utilities (aspect-*).
+    
+    Supports:
+    - aspect-auto
+    - aspect-square (1/1)
+    - aspect-video (16/9)
+    - aspect-<ratio> (e.g. aspect-3/2, aspect-4/3)
+    - aspect-[<value>] (arbitrary values)
+    - aspect-(<custom-property>) (CSS variables)
+    """
     
     name = "aspect-ratio"
     prefixes = ["aspect"]
@@ -602,33 +612,57 @@ class AspectRatioPlugin(UtilityPlugin):
         return token.utility == 'aspect'
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        # 1. Try resolving using standard mechanism (static values, arbitrary values)
         value = self.resolve_value(token, context)
+        
+        # 2. Handle aspect-(--var) shorthand
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+            var_name = token.value[1:-1]
+            value = f"var({var_name})"
+            
+        # 3. Handle numeric ratios (e.g. 3/2, 4/3)
+        if value is None:
+            # Check for simple fraction pattern N/N
+            import re
+            if re.match(r'^\d+(\.\d+)?/\d+(\.\d+)?$', token.value):
+                value = token.value
+        
         if value is None:
             return None
+            
         return self.create_rule(token, 'aspect-ratio', value)
 
 
 class ColumnsPlugin(UtilityPlugin):
-    """Plugin for columns utilities (columns-*)."""
+    """
+    Plugin for columns utilities (columns-*).
+    
+    Supports:
+    - columns-<number> (1-12)
+    - columns-<t-shirt-size> (3xs to 7xl)
+    - columns-auto
+    - columns-[<value>]
+    - columns-(<custom-property>)
+    """
     
     name = "columns"
     prefixes = ["columns"]
     
     STATIC_VALUES = {
         'auto': 'auto',
-        '3xs': '16rem',
-        '2xs': '18rem',
-        'xs': '20rem',
-        'sm': '24rem',
-        'md': '28rem',
-        'lg': '32rem',
-        'xl': '36rem',
-        '2xl': '42rem',
-        '3xl': '48rem',
-        '4xl': '56rem',
-        '5xl': '64rem',
-        '6xl': '72rem',
-        '7xl': '80rem',
+        '3xs': 'var(--container-3xs, 16rem)',
+        '2xs': 'var(--container-2xs, 18rem)',
+        'xs': 'var(--container-xs, 20rem)',
+        'sm': 'var(--container-sm, 24rem)',
+        'md': 'var(--container-md, 28rem)',
+        'lg': 'var(--container-lg, 32rem)',
+        'xl': 'var(--container-xl, 36rem)',
+        '2xl': 'var(--container-2xl, 42rem)',
+        '3xl': 'var(--container-3xl, 48rem)',
+        '4xl': 'var(--container-4xl, 56rem)',
+        '5xl': 'var(--container-5xl, 64rem)',
+        '6xl': 'var(--container-6xl, 72rem)',
+        '7xl': 'var(--container-7xl, 80rem)',
     }
     
     # Generate numeric columns 1-12
@@ -647,7 +681,14 @@ class ColumnsPlugin(UtilityPlugin):
         return token.utility == 'columns'
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        # 1. Standard resolution
         value = self.resolve_value(token, context)
+        
+        # 2. Handle columns-(--var) shorthand
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+            var_name = token.value[1:-1]
+            value = f"var({var_name})"
+            
         if value is None:
             return None
         return self.create_rule(token, 'columns', value)

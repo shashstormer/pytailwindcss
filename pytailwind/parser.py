@@ -147,8 +147,10 @@ class ClassParser:
             if before_slash and before_slash[-1].isdigit():
                 # Check if it's a known fraction pattern
                 parts = before_slash.rsplit('-', 1)
-                if len(parts) == 2 and parts[1].isdigit() and int(after_slash) <= 12:
-                    # Looks like a fraction (e.g., 1/2, 3/4, 11/12)
+                # Check for integer or decimal number
+                is_number = len(parts) == 2 and re.match(r'^\d+(\.\d+)?$', parts[1])
+                if is_number and int(after_slash) <= 12:
+                    # Looks like a fraction (e.g., 1/2, 3/4, 1.5/1)
                     pass  # Don't extract opacity
                 else:
                     class_string = opacity_match.group(1)
