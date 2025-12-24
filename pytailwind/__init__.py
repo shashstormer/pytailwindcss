@@ -317,3 +317,123 @@ class Tailwind:
             >>> print(token.opacity)   # 50
         """
         return ClassParser().parse(class_string)
+    
+    def apply(self, *classes: str) -> str:
+        """
+        Expand utility classes into CSS declarations (like @apply directive).
+        
+        This allows you to inline Tailwind utility classes into custom CSS.
+        
+        Args:
+            *classes: One or more Tailwind utility class names
+            
+        Returns:
+            CSS declarations as a string (without the selector)
+            
+        Example:
+            >>> tw = Tailwind()
+            >>> tw.apply('rounded-lg', 'shadow-md')
+            'border-radius: 0.5rem; box-shadow: ...'
+        """
+        declarations = []
+        for class_name in classes:
+            # Generate CSS for this class
+            css = self.generate(f'<div class="{class_name}"></div>')
+            if css:
+                # Extract declarations from the generated rule
+                # Format: .class-name {declarations}
+                match = re.search(r'\{([^}]+)\}', css)
+                if match:
+                    # Clean up the declaration
+                    decl = match.group(1).strip()
+                    if not decl.endswith(';'):
+                        decl += ';'
+                    declarations.append(decl)
+        
+        return ' '.join(declarations)
+    
+    def spacing_value(self, multiplier: float) -> str:
+        """
+        Calculate a spacing value based on the theme (like --spacing() function).
+        
+        Uses the base spacing unit (0.25rem by default) multiplied by the given value.
+        
+        Args:
+            multiplier: The spacing multiplier (e.g., 4 for p-4)
+            
+        Returns:
+            Calculated spacing value as CSS string
+            
+        Example:
+            >>> tw = Tailwind()
+            >>> tw.spacing_value(4)
+            'calc(var(--spacing) * 4)'
+        """
+        return f'calc(var(--spacing) * {multiplier})'
+    
+    def theme_value(self, path: str) -> str:
+        """
+        Access theme values using dot notation (like theme() function).
+        
+        Args:
+            path: Dot-notation path to the theme value (e.g., 'spacing.4', 'colors.red.500')
+            
+        Returns:
+            The theme value or empty string if not found
+            
+        Example:
+            >>> tw = Tailwind()
+            >>> tw.theme_value('spacing.4')
+            '1rem'
+            >>> tw.theme_value('colors.red.500')
+            '#ef4444'
+        """
+        parts = path.split('.')
+        
+        # Handle spacing
+        if parts[0] == 'spacing' and len(parts) > 1:
+            key = parts[1]
+            return self.spacing.get(key, '')
+        
+        # Handle colors
+        if parts[0] == 'colors' and len(parts) > 1:
+            color_name = parts[1]
+            if color_name in self.colors:
+                color_value = self.colors[color_name]
+                if isinstance(color_value, dict) and len(parts) > 2:
+                    shade = parts[2]
+                    return color_value.get(shade, '')
+                elif isinstance(color_value, str):
+                    return color_value
+            return ''
+        
+        return ''
+    
+    def process_css_with_apply(self, css_content: str) -> str:
+        """
+        Process CSS content and expand @apply directives.
+        
+        Args:
+            css_content: CSS string that may contain @apply directives
+            
+        Returns:
+            CSS with @apply directives expanded
+            
+        Example:
+            >>> tw = Tailwind()
+            >>> css = '''
+            ... .btn {
+            ...     @apply px-4 py-2 rounded-lg;
+            ... }
+            ... '''
+            >>> tw.process_css_with_apply(css)
+        """
+        # Pattern to match @apply directives
+        apply_pattern = re.compile(r'@apply\s+([^;]+);?')
+        
+        def replace_apply(match):
+            classes = match.group(1).strip().split()
+            return self.apply(*classes)
+        
+        return apply_pattern.sub(replace_apply, css_content)
+
