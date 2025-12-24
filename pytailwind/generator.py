@@ -353,7 +353,54 @@ class CSSGenerator:
     
     def _generate_rule(self, token: TailwindToken) -> Optional[Rule]:
         """Generate a CSS rule for a parsed token."""
+        # Handle arbitrary properties: [property:value]
+        if self._is_arbitrary_property(token):
+            return self._handle_arbitrary_property(token)
+        
         return self.registry.generate(token, self.context)
+    
+    def _is_arbitrary_property(self, token: TailwindToken) -> bool:
+        """Check if token is an arbitrary property like [mask-type:luminance] or [--my-var:value]."""
+        utility = token.utility
+        # Arbitrary property: starts with [ and contains a : inside
+        if utility.startswith('[') and utility.endswith(']'):
+            content = utility[1:-1]
+            # Must have property:value format (including CSS variables --my-var:value)
+            if ':' in content:
+                return True
+        return False
+    
+    def _handle_arbitrary_property(self, token: TailwindToken) -> Optional[Rule]:
+        """Handle arbitrary property syntax like [mask-type:luminance]."""
+        utility = token.utility
+        content = utility[1:-1]  # Remove brackets
+        
+        # Split on first colon
+        colon_idx = content.find(':')
+        if colon_idx == -1:
+            return None
+        
+        prop = content[:colon_idx].strip()
+        value = content[colon_idx + 1:].strip()
+        
+        # Replace underscores with spaces (for values like grid-cols-[1fr_2fr])
+        value = value.replace('_', ' ')
+        
+        from .ast import Selector, Declaration
+        
+        selector = Selector(base=f'.{self._escape_class(token.raw)}')
+        declaration = Declaration(property=prop, value=value)
+        
+        return Rule(selector=selector, declarations=[declaration])
+    
+    def _escape_class(self, class_name: str) -> str:
+        """Escape special characters in class names for CSS selectors."""
+        # Characters that need escaping in CSS selectors
+        special_chars = ['[', ']', '#', '(', ')', ',', ':', '@', '/', '.', '%']
+        result = class_name
+        for char in special_chars:
+            result = result.replace(char, f'\\{char}')
+        return result
     
     def _apply_variants(self, rule: Rule, token: TailwindToken) -> Rule:
         """Apply variant modifiers to a rule."""

@@ -195,9 +195,14 @@ class ClassParser:
         Extract variant prefixes from class string.
         
         "hover:md:bg-red-500" -> (["hover", "md"], "bg-red-500")
+        "[mask-type:luminance]" -> ([], "[mask-type:luminance]")  # no split inside brackets
         """
+        # If entire class is a bracketed expression, no variants
+        if class_string.startswith('[') and class_string.endswith(']'):
+            return [], class_string
+        
         variants = []
-        parts = class_string.split(':')
+        parts = self._split_by_colon_respecting_brackets(class_string)
         
         if len(parts) == 1:
             return [], class_string
@@ -207,6 +212,33 @@ class ClassParser:
         variants = parts[:-1]
         
         return variants, remainder
+    
+    def _split_by_colon_respecting_brackets(self, text: str) -> List[str]:
+        """
+        Split text by colon, but not inside brackets.
+        
+        "hover:bg-[#ff0000]" -> ["hover", "bg-[#ff0000]"]
+        "[mask-type:luminance]" -> ["[mask-type:luminance]"]
+        """
+        parts = []
+        current = []
+        bracket_depth = 0
+        
+        for char in text:
+            if char == '[':
+                bracket_depth += 1
+            elif char == ']':
+                bracket_depth -= 1
+            elif char == ':' and bracket_depth == 0:
+                parts.append(''.join(current))
+                current = []
+                continue
+            current.append(char)
+        
+        if current:
+            parts.append(''.join(current))
+        
+        return parts
     
     def _parse_utility_value(self, text: str) -> Tuple[str, Optional[str], str, ValueType]:
         """
