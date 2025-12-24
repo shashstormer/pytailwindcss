@@ -159,6 +159,9 @@ class BorderColorPlugin(ColorPlugin):
     def match(self, token: TailwindToken) -> bool:
         if token.utility != 'border':
             return False
+        # Don't match plain 'border' (no value) - that's border-width
+        if not token.value:
+            return False
         # Don't match border width (numbers) or style
         if token.value in ('0', '2', '4', '8', 'DEFAULT',
                            'solid', 'dashed', 'dotted', 'double', 'hidden', 'none',

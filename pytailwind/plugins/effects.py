@@ -173,10 +173,10 @@ class BorderRadiusPlugin(UtilityPlugin):
 
 
 class BorderWidthPlugin(UtilityPlugin):
-    """Plugin for border-width utilities (border-*, border-t-*, etc.)."""
+    """Plugin for border-width utilities (border, border-x, border-y, border-t, etc.)."""
     
     name = "border-width"
-    prefixes = ["border"]
+    prefixes = ["border", "border-x", "border-y", "border-t", "border-r", "border-b", "border-l", "border-s", "border-e"]
     
     STATIC_VALUES = {
         '': '1px',  # Just "border"
@@ -186,16 +186,17 @@ class BorderWidthPlugin(UtilityPlugin):
         '8': '8px',
     }
     
-    DIRECTIONS = {
-        None: ['border-width'],
-        'x': ['border-left-width', 'border-right-width'],
-        'y': ['border-top-width', 'border-bottom-width'],
-        't': ['border-top-width'],
-        'r': ['border-right-width'],
-        'b': ['border-bottom-width'],
-        'l': ['border-left-width'],
-        's': ['border-inline-start-width'],
-        'e': ['border-inline-end-width'],
+    # Map utility to CSS properties
+    PROPERTY_MAP = {
+        'border': ['border-width'],
+        'border-x': ['border-left-width', 'border-right-width'],
+        'border-y': ['border-top-width', 'border-bottom-width'],
+        'border-t': ['border-top-width'],
+        'border-r': ['border-right-width'],
+        'border-b': ['border-bottom-width'],
+        'border-l': ['border-left-width'],
+        'border-s': ['border-inline-start-width'],
+        'border-e': ['border-inline-end-width'],
     }
     
     @property
@@ -207,15 +208,14 @@ class BorderWidthPlugin(UtilityPlugin):
         return True
     
     def match(self, token: TailwindToken) -> bool:
-        if token.utility != 'border':
+        if token.utility not in self.PROPERTY_MAP:
             return False
         # Match width values, not color or style
-        if not token.value and token.modifier in self.DIRECTIONS:
+        if not token.value:
             return True
         if token.value in self.STATIC_VALUES:
             return True
         if token.value_type == ValueType.ARBITRARY:
-            # Check if it looks like a width value
             inner = token.value[1:-1] if token.value.startswith('[') else token.value
             if any(unit in inner for unit in ['px', 'rem', 'em', '%']):
                 return True
@@ -233,8 +233,8 @@ class BorderWidthPlugin(UtilityPlugin):
         else:
             return None
         
-        # Apply directionally
-        props = self.DIRECTIONS.get(token.modifier, ['border-width'])
+        # Apply to correct properties
+        props = self.PROPERTY_MAP.get(token.utility, ['border-width'])
         properties = {prop: value for prop in props}
         return self.create_multi_rule(token, properties)
 
