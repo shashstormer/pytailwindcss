@@ -31,8 +31,8 @@ def test_config_screens_replace():
 
     # sm should NOT be processed as a media query (since 'sm' is not in media_queries)
     # In the new generator, it may still generate the class but not wrapped in media query
-    # The key check is that it's NOT wrapped in @media (min-width: 640px)
-    assert "@media (min-width: 640px)" not in css
+    # The key check is that it's NOT wrapped in the default sm breakpoint
+    assert "@media (width >= 40rem)" not in css
 
 def test_config_screens_order():
     # Define screens in non-ascending order

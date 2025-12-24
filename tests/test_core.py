@@ -35,7 +35,7 @@ def test_generate_variants(tw):
     html = '<div class="hover:text-red-500 sm:bg-white dark:text-white"></div>'
     css = tw.generate(html)
     assert ".hover\\:text-red-500:hover" in css
-    assert "@media (min-width: 640px) {.sm\\:bg-white" in css
+    assert "@media (width >= 40rem) {.sm\\:bg-white" in css
     assert "@media (prefers-color-scheme: dark) {.dark\\:text-white" in css
 
 def test_generate_arbitrary_values(tw):
@@ -133,7 +133,7 @@ def test_border_x_0(tw):
 def test_media_query_max(tw):
     html = '<div class="max-sm:hidden"></div>'
     css = tw.generate(html)
-    assert "@media (max-width: 640px)" in css
+    assert "@media (width < 40rem)" in css
     assert "display: none;" in css
 
 def test_margin_utilities(tw):

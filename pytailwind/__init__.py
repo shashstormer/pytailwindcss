@@ -71,20 +71,20 @@ class Tailwind:
         # Lazy-initialized generator
         self._generator = None
 
-        # Initialize media queries dictionary
+        # Initialize media queries dictionary (Tailwind v4 syntax)
         self.media_queries = {
-            "xs": "(min-width: 425px)",
-            "sm": "(min-width: 640px)",
-            "md": "(min-width: 768px)",
-            "lg": "(min-width: 1024px)",
-            "xl": "(min-width: 1280px)",
-            "2xl": "(min-width: 1536px)",
-            "max-xs": "(max-width: 425px)",
-            "max-sm": "(max-width: 640px)",
-            "max-md": "(max-width: 768px)",
-            "max-lg": "(max-width: 1024px)",
-            "max-xl": "(max-width: 1280px)",
-            "max-2xl": "(max-width: 1536px)",
+            "xs": "(width >= 30rem)",      # 480px - custom xs
+            "sm": "(width >= 40rem)",      # 640px
+            "md": "(width >= 48rem)",      # 768px
+            "lg": "(width >= 64rem)",      # 1024px
+            "xl": "(width >= 80rem)",      # 1280px
+            "2xl": "(width >= 96rem)",     # 1536px
+            "max-xs": "(width < 30rem)",   # < 480px
+            "max-sm": "(width < 40rem)",   # < 640px
+            "max-md": "(width < 48rem)",   # < 768px
+            "max-lg": "(width < 64rem)",   # < 1024px
+            "max-xl": "(width < 80rem)",   # < 1280px
+            "max-2xl": "(width < 96rem)",  # < 1536px
         }
 
         # List of Media Query Processors

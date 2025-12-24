@@ -197,19 +197,19 @@ class TestMediaQueryVariants:
     """Test media query variants."""
     
     @pytest.mark.parametrize("variant,expected_query", [
-        # Screen breakpoints
-        ("sm", "@media (min-width: 640px)"),
-        ("md", "@media (min-width: 768px)"),
-        ("lg", "@media (min-width: 1024px)"),
-        ("xl", "@media (min-width: 1280px)"),
-        ("2xl", "@media (min-width: 1536px)"),
+        # Screen breakpoints (Tailwind v4 syntax)
+        ("sm", "@media (width >= 40rem)"),
+        ("md", "@media (width >= 48rem)"),
+        ("lg", "@media (width >= 64rem)"),
+        ("xl", "@media (width >= 80rem)"),
+        ("2xl", "@media (width >= 96rem)"),
         
-        # Max breakpoints
-        ("max-sm", "@media (max-width: 640px)"),
-        ("max-md", "@media (max-width: 768px)"),
-        ("max-lg", "@media (max-width: 1024px)"),
-        ("max-xl", "@media (max-width: 1280px)"),
-        ("max-2xl", "@media (max-width: 1536px)"),
+        # Max breakpoints (Tailwind v4 syntax)
+        ("max-sm", "@media (width < 40rem)"),
+        ("max-md", "@media (width < 48rem)"),
+        ("max-lg", "@media (width < 64rem)"),
+        ("max-xl", "@media (width < 80rem)"),
+        ("max-2xl", "@media (width < 96rem)"),
     ])
     def test_screen_breakpoint_variant(self, tw, variant, expected_query):
         html = f'<div class="{variant}:text-red-500"></div>'
@@ -355,7 +355,7 @@ class TestCombinedVariants:
     def test_md_first(self, tw):
         html = '<div class="md:first:text-red-500"></div>'
         css = tw.generate(html)
-        assert "@media (min-width: 768px)" in css
+        assert "@media (width >= 48rem)" in css
         assert ":first-child" in css
 
 

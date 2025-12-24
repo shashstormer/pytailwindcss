@@ -678,6 +678,56 @@ class ObjectFitPlugin(UtilityPlugin):
         return None
 
 
+class ContainerPlugin(UtilityPlugin):
+    """
+    Plugin for container query utilities (@container).
+    
+    Marks an element as a container for container queries.
+    Supports named containers: @container/main
+    """
+    
+    name = "container"
+    prefixes = ["@container"]
+    
+    def match(self, token: TailwindToken) -> bool:
+        full = token.raw.split(':')[-1]  # Get the non-variant part
+        return full == '@container' or full.startswith('@container/')
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        full = token.raw.split(':')[-1]
+        
+        # Check for named container: @container/name
+        if '/' in full:
+            name = full.split('/')[1]
+            return self.create_rule(token, 'container-name', name)
+        
+        # Default @container - just enable container-type
+        return self.create_rule(token, 'container-type', 'inline-size')
+
+
+class ContainerTypePlugin(UtilityPlugin):
+    """Plugin for container-type utilities."""
+    
+    name = "container-type"
+    prefixes = ["container"]
+    
+    STATIC_VALUES = {
+        'normal': 'normal',
+        'size': 'size',
+        'inline-size': 'inline-size',
+    }
+    
+    def match(self, token: TailwindToken) -> bool:
+        if token.utility != 'container':
+            return False
+        return token.value in self.STATIC_VALUES
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        if token.value in self.STATIC_VALUES:
+            return self.create_rule(token, 'container-type', self.STATIC_VALUES[token.value])
+        return None
+
+
 def get_plugins() -> List[UtilityPlugin]:
     """Get all layout-related plugins."""
     return [
@@ -701,4 +751,6 @@ def get_plugins() -> List[UtilityPlugin]:
         AspectRatioPlugin(),
         ColumnsPlugin(),
         ObjectFitPlugin(),
+        ContainerPlugin(),
+        ContainerTypePlugin(),
     ]

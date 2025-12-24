@@ -61,16 +61,16 @@ def test_pseudo_element_variants(tw, processor, expected_selector):
 
 # Media query variants
 @pytest.mark.parametrize("processor,expected_query", [
-    ("sm", "@media (min-width: 640px)"),
-    ("md", "@media (min-width: 768px)"),
-    ("lg", "@media (min-width: 1024px)"),
-    ("xl", "@media (min-width: 1280px)"),
-    ("2xl", "@media (min-width: 1536px)"),
-    ("max-sm", "@media (max-width: 640px)"),
-    ("max-md", "@media (max-width: 768px)"),
-    ("max-lg", "@media (max-width: 1024px)"),
-    ("max-xl", "@media (max-width: 1280px)"),
-    ("max-2xl", "@media (max-width: 1536px)"),
+    ("sm", "@media (width >= 40rem)"),
+    ("md", "@media (width >= 48rem)"),
+    ("lg", "@media (width >= 64rem)"),
+    ("xl", "@media (width >= 80rem)"),
+    ("2xl", "@media (width >= 96rem)"),
+    ("max-sm", "@media (width < 40rem)"),
+    ("max-md", "@media (width < 48rem)"),
+    ("max-lg", "@media (width < 64rem)"),
+    ("max-xl", "@media (width < 80rem)"),
+    ("max-2xl", "@media (width < 96rem)"),
     ("dark", "@media (prefers-color-scheme: dark)"),
     ("light", "@media (prefers-color-scheme: light)"),
     ("motion-safe", "@media (prefers-reduced-motion: no-preference)"),
@@ -101,7 +101,7 @@ def test_variant_combinations(tw):
     """Test combining pseudo-class and media query variants."""
     html = '<div class="hover:sm:text-red-500"></div>'
     css = tw.generate(html)
-    assert "@media (min-width: 640px)" in css
+    assert "@media (width >= 40rem)" in css
     assert ":hover" in css
 
 
