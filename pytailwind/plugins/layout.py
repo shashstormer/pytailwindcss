@@ -158,7 +158,43 @@ class FlexPlugin(UtilityPlugin):
         return True
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        # 0. Check for invalid modifiers that parser might have let through
+        if token.value in ('row', 'row-reverse', 'col', 'col-reverse', 'wrap', 'wrap-reverse', 'nowrap'):
+            return None
+
+        # 1. Standard resolution (static values like 1, auto, none, initial)
         value = self.resolve_value(token, context)
+        
+        # 2. Handle flex-(--var) shorthand
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+            var_name = token.value[1:-1]
+            value = f"var({var_name})"
+            
+        # 3. Handle numeric values (flex-1, flex-2) that aren't static keys
+        # Existing static map has '1', but not others
+        if value is None and token.value.isdigit():
+             value = token.value
+
+        # 4. Handle fractions (flex-1/2 -> flex: 50%)
+        # Note: Tailwind implementation for flex fractions sets flex-grow, flex-shrink, and flex-basis
+        if value is None:
+             import re
+             if re.match(r'^\d+/\d+$', token.value):
+                 parts = token.value.split('/')
+                 num, den = float(parts[0]), float(parts[1])
+                 if den != 0:
+                     percent = (num / den) * 100
+                     # flex: <fraction> 100% -> shorthand for 0% basis in check
+                     # Tailwind doc says flex-<fraction> -> flex: 0 0 <fraction>% typically?
+                     # Let's check spec: 
+                     # basis-<fraction> -> basis: X%
+                     # flex-<fraction> -> flex: <fraction> <fraction> 0% usually implies grow/shrink?
+                     # Wait, spec says: flex-<fraction> -> flex: calc(<fraction> * 100%)
+                     # Which expands to: flex-grow: <val>, flex-shrink: 1, flex-basis: 0% usually
+                     # But spec shorthand `flex: <val>` means `flex-grow: <val>, flex-shrink: 1, flex-basis: 0`
+                     # So `flex: 50%` is what we want.
+                     value = f"{percent:g}%"
+
         if value is None:
             return None
         return self.create_rule(token, 'flex', value)
@@ -239,8 +275,19 @@ class FlexGrowPlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Default for just "grow"
         if value is None and not token.value:
-            value = '1'  # Default for just "grow"
+            value = '1'
+            
+        # Handle number
+        if value is None and token.value.isdigit():
+            value = token.value
+            
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+
         if value is None:
             return None
         return self.create_rule(token, 'flex-grow', value)
@@ -270,8 +317,19 @@ class FlexShrinkPlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Default for just "shrink"
         if value is None and not token.value:
-            value = '1'  # Default for just "shrink"
+            value = '1'
+            
+        # Handle number
+        if value is None and token.value.isdigit():
+            value = token.value
+            
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+
         if value is None:
             return None
         return self.create_rule(token, 'flex-shrink', value)
@@ -286,6 +344,19 @@ class FlexBasisPlugin(UtilityPlugin):
     STATIC_VALUES = {
         'auto': 'auto',
         'full': '100%',
+        '3xs': 'var(--container-3xs, 16rem)',
+        '2xs': 'var(--container-2xs, 18rem)',
+        'xs': 'var(--container-xs, 20rem)',
+        'sm': 'var(--container-sm, 24rem)',
+        'md': 'var(--container-md, 28rem)',
+        'lg': 'var(--container-lg, 32rem)',
+        'xl': 'var(--container-xl, 36rem)',
+        '2xl': 'var(--container-2xl, 42rem)',
+        '3xl': 'var(--container-3xl, 48rem)',
+        '4xl': 'var(--container-4xl, 56rem)',
+        '5xl': 'var(--container-5xl, 64rem)',
+        '6xl': 'var(--container-6xl, 72rem)',
+        '7xl': 'var(--container-7xl, 80rem)',
         '1/2': '50%',
         '1/3': '33.333333%',
         '2/3': '66.666667%',
@@ -315,10 +386,18 @@ class FlexBasisPlugin(UtilityPlugin):
         return True
     
     def match(self, token: TailwindToken) -> bool:
+         # Need to be careful not to swallow other basis-* if they exist
+         # But usually basis-* is flex-basis
         return token.utility == 'basis'
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+
         if value is None:
             return None
         return self.create_rule(token, 'flex-basis', value)
@@ -573,6 +652,11 @@ class OrderPlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+
         if value is None:
             return None
         return self.create_rule(token, 'order', value)
