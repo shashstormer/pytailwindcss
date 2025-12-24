@@ -905,6 +905,191 @@ class BoxSizingPlugin(UtilityPlugin):
         return self.create_rule(token, 'box-sizing', value)
 
 
+
+class FloatPlugin(UtilityPlugin):
+    """Plugin for float utilities (float-*)."""
+    name = "float"
+    prefixes = ["float"]
+    
+    STATIC_VALUES = {
+        'right': 'right',
+        'left': 'left',
+        'none': 'none',
+        'start': 'inline-start',
+        'end': 'inline-end',
+    }
+    
+    @property
+    def static_values(self) -> Dict[str, str]:
+        return self.STATIC_VALUES
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == 'float'
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        value = self.resolve_value(token, context)
+        if value is None:
+            return None
+        return self.create_rule(token, 'float', value)
+
+
+class ClearPlugin(UtilityPlugin):
+    """Plugin for clear utilities (clear-*)."""
+    name = "clear"
+    prefixes = ["clear"]
+    
+    STATIC_VALUES = {
+        'left': 'left',
+        'right': 'right',
+        'both': 'both',
+        'none': 'none',
+        'start': 'inline-start',
+        'end': 'inline-end',
+    }
+    
+    @property
+    def static_values(self) -> Dict[str, str]:
+        return self.STATIC_VALUES
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == 'clear'
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        value = self.resolve_value(token, context)
+        if value is None:
+            return None
+        return self.create_rule(token, 'clear', value)
+
+
+class IsolationPlugin(UtilityPlugin):
+    """Plugin for isolation utilities (isolate, isolation-auto)."""
+    name = "isolation"
+    prefixes = ["isolate", "isolation"]
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility in ('isolate', 'isolation')
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        if token.utility == 'isolate':
+            return self.create_rule(token, 'isolation', 'isolate')
+        if token.utility == 'isolation' and token.value == 'auto':
+            return self.create_rule(token, 'isolation', 'auto')
+        return None
+
+
+class ObjectPositionPlugin(UtilityPlugin):
+    """Plugin for object-position utilities (object-*)."""
+    name = "object-position"
+    prefixes = ["object"]
+    
+    STATIC_VALUES = {
+        'bottom': 'bottom',
+        'center': 'center',
+        'left': 'left',
+        'right': 'right',
+        'top': 'top',
+        'bottom-left': 'bottom left',
+        'bottom-right': 'bottom right',
+        'top-left': 'top left',
+        'top-right': 'top right',
+    }
+    
+    @property
+    def static_values(self) -> Dict[str, str]:
+        return self.STATIC_VALUES
+    
+    @property
+    def supports_arbitrary(self) -> bool:
+        return True
+    
+    def match(self, token: TailwindToken) -> bool:
+        if token.utility != 'object':
+            return False
+        # Avoid conflict with ObjectFitPlugin (contain, cover, etc.)
+        if token.value in ('contain', 'cover', 'fill', 'scale-down', 'none') and token.value_type == ValueType.STATIC:
+            return False
+        return True
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        value = self.resolve_value(token, context)
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+        
+        if value is None:
+            return None
+        return self.create_rule(token, 'object-position', value)
+
+
+class OverscrollPlugin(UtilityPlugin):
+    """Plugin for overscroll-behavior utilities."""
+    name = "overscroll"
+    prefixes = ["overscroll"]
+    
+    STATIC_VALUES = {
+        'auto': 'auto',
+        'contain': 'contain',
+        'none': 'none',
+    }
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == 'overscroll'
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        if token.value not in self.STATIC_VALUES:
+            return None
+        value = self.STATIC_VALUES[token.value]
+        
+        prop = 'overscroll-behavior'
+        if token.modifier == 'x': prop += '-x'
+        elif token.modifier == 'y': prop += '-y'
+        
+        return self.create_rule(token, prop, value)
+
+
+class VisibilityPlugin(UtilityPlugin):
+    """Plugin for visibility utilities."""
+    name = "visibility"
+    prefixes = ["visible", "invisible", "collapse"]
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility in self.prefixes
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        if token.utility == 'visible':
+            return self.create_rule(token, 'visibility', 'visible')
+        if token.utility == 'invisible':
+            return self.create_rule(token, 'visibility', 'hidden')
+        if token.utility == 'collapse':
+            return self.create_rule(token, 'visibility', 'collapse')
+        return None
+
+
+class SrOnlyPlugin(UtilityPlugin):
+    """Plugin for screen-reader utilities."""
+    name = "sr-only"
+    prefixes = ["sr", "not-sr"]
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.raw == "sr-only" or token.raw == "not-sr-only" or \
+               (token.utility == "sr" and token.value == "only") or \
+               (token.utility == "not-sr" and token.value == "only")
+        
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        if "not-sr" in token.raw or "not-sr" in token.utility:
+             return self.create_multi_rule(token, {
+               "position": "static", "width": "auto", "height": "auto",
+               "padding": "0", "margin": "0", "overflow": "visible",
+               "clip": "auto", "white-space": "normal"
+           })
+        return self.create_multi_rule(token, {
+           "position": "absolute", "width": "1px", "height": "1px",
+           "padding": "0", "margin": "-1px", "overflow": "hidden",
+           "clip": "rect(0, 0, 0, 0)", "white-space": "nowrap",
+           "border-width": "0"
+       })
+
+
 def get_plugins() -> List[UtilityPlugin]:
     """Get all layout-related plugins."""
     return [
@@ -935,4 +1120,11 @@ def get_plugins() -> List[UtilityPlugin]:
         BreakInsidePlugin(),
         BoxDecorationBreakPlugin(),
         BoxSizingPlugin(),
+        FloatPlugin(),
+        ClearPlugin(),
+        IsolationPlugin(),
+        ObjectPositionPlugin(),
+        OverscrollPlugin(),
+        VisibilityPlugin(),
+        SrOnlyPlugin(),
     ]

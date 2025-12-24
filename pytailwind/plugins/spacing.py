@@ -505,10 +505,10 @@ class SpacePlugin(UtilityPlugin):
 
 
 class InsetPlugin(UtilityPlugin):
-    """Plugin for inset/positioning utilities (inset-*, top-*, right-*, etc.)."""
+    """Plugin for inset/positioning utilities (inset-*, top-*, right-*, start-*, etc.)."""
     
     name = "inset"
-    prefixes = ["inset", "top", "right", "bottom", "left"]
+    prefixes = ["inset", "top", "right", "bottom", "left", "start", "end"]
     
     STATIC_VALUES = {
         'auto': 'auto',
@@ -536,20 +536,33 @@ class InsetPlugin(UtilityPlugin):
     def match(self, token: TailwindToken) -> bool:
         if token.utility == 'inset':
             return token.modifier in (None, 'x', 'y')
-        return token.utility in ('top', 'right', 'bottom', 'left')
+        return token.utility in self.prefixes
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Handle CSS variable shorthand
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+             
         if value is None:
             return None
+            
+        # Handle negative values for static/fractional types
+        if token.is_negative and not value.startswith('-') and value not in ('0', '0px', 'auto'):
+            value = f"-{value}"
         
         if token.utility == 'inset':
             if token.modifier == 'x':
-                return self.create_multi_rule(token, {'left': value, 'right': value})
+                return self.create_rule(token, 'inset-inline', value)
             elif token.modifier == 'y':
-                return self.create_multi_rule(token, {'top': value, 'bottom': value})
+                return self.create_rule(token, 'inset-block', value)
             else:
                 return self.create_rule(token, 'inset', value)
+        elif token.utility == 'start':
+            return self.create_rule(token, 'inset-inline-start', value)
+        elif token.utility == 'end':
+            return self.create_rule(token, 'inset-inline-end', value)
         else:
             return self.create_rule(token, token.utility, value)
 

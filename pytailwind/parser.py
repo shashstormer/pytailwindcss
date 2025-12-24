@@ -119,6 +119,10 @@ class ClassParser:
         # New Layout Utils
         'break-after', 'break-before', 'break-inside',
         'box', 'box-decoration',
+        'float', 'clear', 'isolate', 'isolation',
+        'visible', 'invisible', 'collapse',
+        'start', 'end',
+        'not-sr',
     }
     
     def parse(self, class_string: str) -> TailwindToken:
@@ -298,6 +302,12 @@ class ClassParser:
         for length in range(min(3, len(parts)), 0, -1):
             candidate = "-".join(parts[:length])
             if candidate in self.UTILITY_PREFIXES:
+                # Special Check for modifiers that get swallowed by prefix match
+                if candidate in ('inset', 'overscroll') and length < len(parts):
+                     next_part = parts[length]
+                     if next_part in ('x', 'y'):
+                          return candidate, next_part, length + 1
+                
                 return candidate, None, length
         
         # Check for directional modifiers (px, mx, mt, etc.)
@@ -336,6 +346,9 @@ class ClassParser:
                 return first, parts[1], 2
             
             if first == 'scroll' and len(parts) > 1 and parts[1] in ('m', 'p', 'mx', 'my', 'px', 'py', 'mt', 'mr', 'mb', 'ml', 'pt', 'pr', 'pb', 'pl'):
+                return first, parts[1], 2
+            
+            if first == 'overscroll' and len(parts) > 1 and parts[1] in ('x', 'y'):
                 return first, parts[1], 2
         
         # Default: first part is utility

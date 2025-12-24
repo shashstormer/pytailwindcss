@@ -49,7 +49,7 @@ with open("page.css", "wt") as f:
 
 **pyTailwindCSS** now supports a comprehensive set of **Tailwind CSS v4.1** features:
 
-- **Core Utilities**: Full support for Layout, Flexbox, Grid, Spacing, Sizing, Typography, Backgrounds, Borders, Effects, Filters, Tables, Transitions, and Transforms.
+- **Core Utilities**: Full support for Layout (including Aspect Ratio, Columns, Break & Box utilities), Flexbox, Grid, Spacing, Sizing, Typography, Backgrounds, Borders, Effects, Filters, Tables, Transitions, and Transforms.
 - **Modern Theme System**: Complete implementation of v4 theme variables for colors, fonts, shadows, radii, and more.
 - **Arbitrary Values**: Support for JIT-style arbitrary values (e.g., `w-[123px]`, `bg-[#bada55]`) and properties (e.g., `[mask-type:luminance]`).
 - **Directives & Functions**: Support for `@apply`, `theme()`, and `--spacing()` via the Python API.
