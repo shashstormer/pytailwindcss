@@ -769,6 +769,142 @@ class ContainerTypePlugin(UtilityPlugin):
         return None
 
 
+
+
+class BreakAfterPlugin(UtilityPlugin):
+    """Plugin for break-after utilities."""
+    name = "break-after"
+    prefixes = ["break-after"]
+    
+    STATIC_VALUES = {
+        'auto': 'auto',
+        'avoid': 'avoid',
+        'all': 'all',
+        'avoid-page': 'avoid-page',
+        'page': 'page',
+        'left': 'left',
+        'right': 'right',
+        'column': 'column',
+    }
+    
+    @property
+    def static_values(self) -> Dict[str, str]:
+        return self.STATIC_VALUES
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == "break-after"
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        value = self.resolve_value(token, context)
+        if value is None:
+            return None
+        return self.create_rule(token, 'break-after', value)
+
+
+class BreakBeforePlugin(UtilityPlugin):
+    """Plugin for break-before utilities."""
+    name = "break-before"
+    prefixes = ["break-before"]
+    
+    STATIC_VALUES = {
+        'auto': 'auto',
+        'avoid': 'avoid',
+        'all': 'all',
+        'avoid-page': 'avoid-page',
+        'page': 'page',
+        'left': 'left',
+        'right': 'right',
+        'column': 'column',
+    }
+    
+    @property
+    def static_values(self) -> Dict[str, str]:
+        return self.STATIC_VALUES
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == "break-before"
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        value = self.resolve_value(token, context)
+        if value is None:
+            return None
+        return self.create_rule(token, 'break-before', value)
+
+
+class BreakInsidePlugin(UtilityPlugin):
+    """Plugin for break-inside utilities."""
+    name = "break-inside"
+    prefixes = ["break-inside"]
+    
+    STATIC_VALUES = {
+        'auto': 'auto',
+        'avoid': 'avoid',
+        'avoid-page': 'avoid-page',
+        'avoid-column': 'avoid-column',
+    }
+    
+    @property
+    def static_values(self) -> Dict[str, str]:
+        return self.STATIC_VALUES
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == "break-inside"
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        value = self.resolve_value(token, context)
+        if value is None:
+            return None
+        return self.create_rule(token, 'break-inside', value)
+
+
+class BoxDecorationBreakPlugin(UtilityPlugin):
+    """Plugin for box-decoration-break utilities (box-decoration-*)."""
+    name = "box-decoration-break"
+    prefixes = ["box-decoration"]
+    
+    STATIC_VALUES = {
+        'clone': 'clone',
+        'slice': 'slice',
+    }
+    
+    @property
+    def static_values(self) -> Dict[str, str]:
+        return self.STATIC_VALUES
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == "box-decoration"
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        value = self.resolve_value(token, context)
+        if value is None:
+            return None
+        return self.create_rule(token, 'box-decoration-break', value)
+
+
+class BoxSizingPlugin(UtilityPlugin):
+    """Plugin for box-sizing utilities (box-*)."""
+    name = "box-sizing"
+    prefixes = ["box"]
+    
+    STATIC_VALUES = {
+        'border': 'border-box',
+        'content': 'content-box',
+    }
+    
+    @property
+    def static_values(self) -> Dict[str, str]:
+        return self.STATIC_VALUES
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == "box"
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        value = self.resolve_value(token, context)
+        if value is None:
+            return None
+        return self.create_rule(token, 'box-sizing', value)
+
+
 def get_plugins() -> List[UtilityPlugin]:
     """Get all layout-related plugins."""
     return [
@@ -794,4 +930,9 @@ def get_plugins() -> List[UtilityPlugin]:
         ObjectFitPlugin(),
         ContainerPlugin(),
         ContainerTypePlugin(),
+        BreakAfterPlugin(),
+        BreakBeforePlugin(),
+        BreakInsidePlugin(),
+        BoxDecorationBreakPlugin(),
+        BoxSizingPlugin(),
     ]

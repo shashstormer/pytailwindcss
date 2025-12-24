@@ -116,6 +116,9 @@ class ClassParser:
         'will-change', 'cursor', 'pointer-events', 'resize',
         'appearance', 'list', 'sr',
         'space-x', 'space-y',
+        # New Layout Utils
+        'break-after', 'break-before', 'break-inside',
+        'box', 'box-decoration',
     }
     
     def parse(self, class_string: str) -> TailwindToken:
