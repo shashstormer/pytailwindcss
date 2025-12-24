@@ -184,6 +184,7 @@ class Stylesheet(CSSNode):
     
     # Track media queries for grouping
     _media_groups: Dict[str, MediaQuery] = field(default_factory=dict, repr=False)
+    _container_groups: Dict[str, 'ContainerQuery'] = field(default_factory=dict, repr=False)
     
     def to_css(self) -> str:
         """Render all nodes to CSS string."""
@@ -204,9 +205,42 @@ class Stylesheet(CSSNode):
         self._media_groups[query].add_rule(rule)
         return self
     
+    def add_container_rule(self, query: str, rule: Rule) -> 'Stylesheet':
+        """Add a rule inside a container query, grouping by query."""
+        if query not in self._container_groups:
+            container = ContainerQuery(query=query)
+            self._container_groups[query] = container
+            self.nodes.append(container)
+        
+        self._container_groups[query].add_rule(rule)
+        return self
+    
     def add_node(self, node: CSSNode) -> 'Stylesheet':
         """Add any CSS node to the stylesheet."""
         self.nodes.append(node)
+        return self
+
+
+@dataclass
+class ContainerQuery(CSSNode):
+    """
+    CSS @container rule wrapper.
+    
+    Example: "@container (width >= 24rem) {.@sm\\:bg-red-500 {...}}"
+    """
+    query: str
+    rules: List[Rule] = field(default_factory=list)
+    
+    def to_css(self) -> str:
+        if not self.rules:
+            return ""
+        
+        inner = "".join(r.to_css() for r in self.rules)
+        return f"@container {self.query} {{{inner}}}"
+    
+    def add_rule(self, rule: Rule) -> 'ContainerQuery':
+        """Add a rule to this container query. Returns self for chaining."""
+        self.rules.append(rule)
         return self
 
 

@@ -26,41 +26,56 @@ class CSSGenerator:
     applying variants, and rendering the final CSS.
     """
     
-    # Pseudo-class mappings
+    # Pseudo-class mappings (Tailwind v4 complete)
     PSEUDO_CLASSES = {
+        # Interactive states
         'hover': 'hover',
         'focus': 'focus',
         'active': 'active',
         'visited': 'visited',
+        'target': 'target',
+        'focus-within': 'focus-within',
+        'focus-visible': 'focus-visible',
+        
+        # Child position
         'first': 'first-child',
         'last': 'last-child',
+        'only': 'only-child',
         'odd': 'nth-child(odd)',
         'even': 'nth-child(even)',
+        'first-of-type': 'first-of-type',
+        'last-of-type': 'last-of-type',
+        'only-of-type': 'only-of-type',
+        
+        # Form states
         'disabled': 'disabled',
         'enabled': 'enabled',
         'checked': 'checked',
-        'required': 'required',
-        'invalid': 'invalid',
-        'valid': 'valid',
-        'focus-within': 'focus-within',
-        'focus-visible': 'focus-visible',
-        'first-of-type': 'first-of-type',
-        'last-of-type': 'last-of-type',
-        'only-child': 'only-child',
-        'only-of-type': 'only-of-type',
-        'empty': 'empty',
-        'read-only': 'read-only',
-        'placeholder-shown': 'placeholder-shown',
-        'default': 'default',
         'indeterminate': 'indeterminate',
+        'default': 'default',
+        'optional': 'optional',
+        'required': 'required',
+        'valid': 'valid',
+        'invalid': 'invalid',
+        'user-valid': 'user-valid',
+        'user-invalid': 'user-invalid',
+        'in-range': 'in-range',
+        'out-of-range': 'out-of-range',
+        'placeholder-shown': 'placeholder-shown',
         'autofill': 'autofill',
+        'read-only': 'read-only',
+        
+        # Other
+        'empty': 'empty',
     }
     
     # Negated pseudo-classes
     NEGATED_PSEUDO_CLASSES = {
         'not-first': 'not(:first-child)',
         'not-last': 'not(:last-child)',
+        'not-only': 'not(:only-child)',
         'not-disabled': 'not(:disabled)',
+        'not-enabled': 'not(:enabled)',
         'not-checked': 'not(:checked)',
         'not-odd': 'not(:nth-child(odd))',
         'not-even': 'not(:nth-child(even))',
@@ -77,24 +92,136 @@ class CSSGenerator:
         'backdrop': 'backdrop',
         'placeholder': 'placeholder',
         'file': 'file-selector-button',
+        'details-content': 'details-content',
     }
     
     # Group variants (require parent selector)
     GROUP_VARIANTS = {
-        'group-hover': ('.group:hover', ''),
-        'group-focus': ('.group:focus', ''),
-        'group-active': ('.group:active', ''),
+        'group-hover': '.group:hover',
+        'group-focus': '.group:focus',
+        'group-active': '.group:active',
+        'group-visited': '.group:visited',
+        'group-disabled': '.group:disabled',
+        'group-checked': '.group:checked',
+        'group-first': '.group:first-child',
+        'group-last': '.group:last-child',
+        'group-odd': '.group:nth-child(odd)',
+        'group-even': '.group:nth-child(even)',
+        'group-focus-within': '.group:focus-within',
+        'group-focus-visible': '.group:focus-visible',
     }
     
     # Peer variants (require sibling selector)
     PEER_VARIANTS = {
-        'peer-hover': ('.peer:hover ~', ''),
-        'peer-focus': ('.peer:focus ~', ''),
-        'peer-active': ('.peer:active ~', ''),
-        'peer-checked': ('.peer:checked ~', ''),
-        'peer-required': ('.peer:required ~', ''),
-        'peer-invalid': ('.peer:invalid ~', ''),
-        'peer-placeholder-shown': ('.peer:placeholder-shown ~', ''),
+        'peer-hover': '.peer:hover ~',
+        'peer-focus': '.peer:focus ~',
+        'peer-active': '.peer:active ~',
+        'peer-visited': '.peer:visited ~',
+        'peer-disabled': '.peer:disabled ~',
+        'peer-checked': '.peer:checked ~',
+        'peer-required': '.peer:required ~',
+        'peer-invalid': '.peer:invalid ~',
+        'peer-valid': '.peer:valid ~',
+        'peer-placeholder-shown': '.peer:placeholder-shown ~',
+        'peer-first': '.peer:first-child ~',
+        'peer-last': '.peer:last-child ~',
+        'peer-odd': '.peer:nth-child(odd) ~',
+        'peer-even': '.peer:nth-child(even) ~',
+        'peer-focus-visible': '.peer:focus-visible ~',
+    }
+    
+    # ARIA attribute variants
+    ARIA_VARIANTS = {
+        'aria-busy': '[aria-busy="true"]',
+        'aria-checked': '[aria-checked="true"]',
+        'aria-disabled': '[aria-disabled="true"]',
+        'aria-expanded': '[aria-expanded="true"]',
+        'aria-hidden': '[aria-hidden="true"]',
+        'aria-pressed': '[aria-pressed="true"]',
+        'aria-readonly': '[aria-readonly="true"]',
+        'aria-required': '[aria-required="true"]',
+        'aria-selected': '[aria-selected="true"]',
+    }
+    
+    # State variants
+    STATE_VARIANTS = {
+        'open': 'is([open], :popover-open, :open)',
+        'inert': 'is([inert], [inert] *)',
+    }
+    
+    # Direction variants
+    DIRECTION_VARIANTS = {
+        'rtl': 'where(:dir(rtl), [dir="rtl"], [dir="rtl"] *)',
+        'ltr': 'where(:dir(ltr), [dir="ltr"], [dir="ltr"] *)',
+    }
+    
+    # Media feature variants
+    MEDIA_FEATURE_VARIANTS = {
+        # Color scheme
+        'dark': '(prefers-color-scheme: dark)',
+        'light': '(prefers-color-scheme: light)',
+        
+        # Motion
+        'motion-safe': '(prefers-reduced-motion: no-preference)',
+        'motion-reduce': '(prefers-reduced-motion: reduce)',
+        
+        # Contrast
+        'contrast-more': '(prefers-contrast: more)',
+        'contrast-less': '(prefers-contrast: less)',
+        
+        # Forced colors
+        'forced-colors': '(forced-colors: active)',
+        
+        # Inverted colors
+        'inverted-colors': '(inverted-colors: inverted)',
+        
+        # Pointer
+        'pointer-fine': '(pointer: fine)',
+        'pointer-coarse': '(pointer: coarse)',
+        'pointer-none': '(pointer: none)',
+        'any-pointer-fine': '(any-pointer: fine)',
+        'any-pointer-coarse': '(any-pointer: coarse)',
+        'any-pointer-none': '(any-pointer: none)',
+        
+        # Orientation
+        'portrait': '(orientation: portrait)',
+        'landscape': '(orientation: landscape)',
+        
+        # Scripting
+        'noscript': '(scripting: none)',
+        
+        # Print
+        'print': 'print',
+    }
+    
+    # Container query breakpoints
+    CONTAINER_QUERIES = {
+        '@3xs': '(width >= 16rem)',
+        '@2xs': '(width >= 18rem)',
+        '@xs': '(width >= 20rem)',
+        '@sm': '(width >= 24rem)',
+        '@md': '(width >= 28rem)',
+        '@lg': '(width >= 32rem)',
+        '@xl': '(width >= 36rem)',
+        '@2xl': '(width >= 42rem)',
+        '@3xl': '(width >= 48rem)',
+        '@4xl': '(width >= 56rem)',
+        '@5xl': '(width >= 64rem)',
+        '@6xl': '(width >= 72rem)',
+        '@7xl': '(width >= 80rem)',
+        '@max-3xs': '(width < 16rem)',
+        '@max-2xs': '(width < 18rem)',
+        '@max-xs': '(width < 20rem)',
+        '@max-sm': '(width < 24rem)',
+        '@max-md': '(width < 28rem)',
+        '@max-lg': '(width < 32rem)',
+        '@max-xl': '(width < 36rem)',
+        '@max-2xl': '(width < 42rem)',
+        '@max-3xl': '(width < 48rem)',
+        '@max-4xl': '(width < 56rem)',
+        '@max-5xl': '(width < 64rem)',
+        '@max-6xl': '(width < 72rem)',
+        '@max-7xl': '(width < 80rem)',
     }
     
     def __init__(
@@ -162,6 +289,7 @@ class CSSGenerator:
         # Parse and generate
         stylesheet = Stylesheet()
         media_groups: Dict[str, List[Rule]] = {}
+        container_groups: Dict[str, List[Rule]] = {}
         
         # Track gradient classes for ordering
         from_rules = []
@@ -178,8 +306,11 @@ class CSSGenerator:
                 
                 # Check for media query variants
                 media_query = self._get_media_query(token)
+                container_query = self._get_container_query(token)
                 
-                if media_query:
+                if container_query:
+                    container_groups.setdefault(container_query, []).append(rule)
+                elif media_query:
                     media_groups.setdefault(media_query, []).append(rule)
                 else:
                     # Special ordering for gradients
@@ -205,6 +336,11 @@ class CSSGenerator:
             for rule in rules:
                 stylesheet.add_media_rule(query, rule)
         
+        # Add container query groups
+        for query, rules in container_groups.items():
+            for rule in rules:
+                stylesheet.add_container_rule(query, rule)
+        
         return stylesheet.to_css()
     
     def _generate_rule(self, token: TailwindToken) -> Optional[Rule]:
@@ -220,12 +356,27 @@ class CSSGenerator:
         pseudo_classes = list(selector.pseudo_classes)
         pseudo_elements = list(selector.pseudo_elements)
         combinator_prefix = selector.combinator_prefix
+        attribute_selectors = []
         
         for variant in token.variants:
-            # Skip media query variants (handled separately)
+            # Skip media/container query variants (handled separately)
             if variant in self.media_queries:
                 continue
-            if variant in ('dark', 'light', 'print', 'motion-safe', 'motion-reduce'):
+            if variant in self.MEDIA_FEATURE_VARIANTS:
+                continue
+            if variant in self.CONTAINER_QUERIES:
+                continue
+            
+            # Handle arbitrary variants
+            if self._is_arbitrary_variant(variant):
+                arbitrary_selector = self._handle_arbitrary_variant(variant)
+                if arbitrary_selector:
+                    if arbitrary_selector.startswith('['):
+                        attribute_selectors.append(arbitrary_selector)
+                    elif arbitrary_selector.startswith(':'):
+                        pseudo_classes.append(arbitrary_selector[1:])
+                    else:
+                        pseudo_classes.append(arbitrary_selector)
                 continue
             
             # Pseudo-classes
@@ -238,14 +389,36 @@ class CSSGenerator:
                 pseudo_elements.append(self.PSEUDO_ELEMENTS[variant])
             # Group variants
             elif variant in self.GROUP_VARIANTS:
-                combinator_prefix = self.GROUP_VARIANTS[variant][0]
+                combinator_prefix = self.GROUP_VARIANTS[variant]
             # Peer variants
             elif variant in self.PEER_VARIANTS:
-                combinator_prefix = self.PEER_VARIANTS[variant][0]
+                combinator_prefix = self.PEER_VARIANTS[variant]
+            # ARIA variants
+            elif variant in self.ARIA_VARIANTS:
+                attribute_selectors.append(self.ARIA_VARIANTS[variant])
+            # State variants
+            elif variant in self.STATE_VARIANTS:
+                pseudo_classes.append(self.STATE_VARIANTS[variant])
+            # Direction variants
+            elif variant in self.DIRECTION_VARIANTS:
+                pseudo_classes.append(self.DIRECTION_VARIANTS[variant])
+            # Child selector (*)
+            elif variant == '*':
+                selector_base = selector.base
+                new_base = f":is({selector_base} > *)"
+                selector = Selector(base=new_base)
+            # Descendant selector (**)
+            elif variant == '**':
+                selector_base = selector.base
+                new_base = f":is({selector_base} *)"
+                selector = Selector(base=new_base)
+        
+        # Build attribute suffix
+        attr_suffix = ''.join(attribute_selectors)
         
         # Create new selector with variants applied
         new_selector = Selector(
-            base=selector.base,
+            base=selector.base + attr_suffix,
             pseudo_classes=pseudo_classes,
             pseudo_elements=pseudo_elements,
             combinator_prefix=combinator_prefix,
@@ -254,6 +427,57 @@ class CSSGenerator:
         
         return Rule(selector=new_selector, declarations=rule.declarations)
     
+    def _is_arbitrary_variant(self, variant: str) -> bool:
+        """Check if a variant is arbitrary (contains [...])."""
+        return '[' in variant and ']' in variant
+    
+    def _handle_arbitrary_variant(self, variant: str) -> Optional[str]:
+        """Handle arbitrary variants like has-[...], nth-[...], aria-[...], data-[...]."""
+        # Match pattern: prefix-[value]
+        match = re.match(r'^(\w+(?:-\w+)*)-\[(.+)\]$', variant)
+        if not match:
+            return None
+        
+        prefix, value = match.groups()
+        value = value.replace('_', ' ')  # Replace underscores with spaces
+        
+        # Handle different arbitrary variant types
+        if prefix == 'has':
+            return f'has({value})'
+        elif prefix == 'not':
+            return f'not({value})'
+        elif prefix == 'is':
+            return f'is({value})'
+        elif prefix == 'where':
+            return f'where({value})'
+        elif prefix == 'nth':
+            return f'nth-child({value})'
+        elif prefix == 'nth-last':
+            return f'nth-last-child({value})'
+        elif prefix == 'nth-of-type':
+            return f'nth-of-type({value})'
+        elif prefix == 'nth-last-of-type':
+            return f'nth-last-of-type({value})'
+        elif prefix == 'aria':
+            return f'[aria-{value}]'
+        elif prefix == 'data':
+            return f'[data-{value}]'
+        elif prefix == 'group':
+            return f'.group:{value}'
+        elif prefix == 'peer':
+            return f'.peer:{value} ~'
+        elif prefix == 'supports':
+            # This is handled as media query
+            return None
+        elif prefix == 'min':
+            # This is handled as media query
+            return None
+        elif prefix == 'max':
+            # This is handled as media query
+            return None
+        
+        return None
+    
     def _get_media_query(self, token: TailwindToken) -> Optional[str]:
         """Get media query string for token variants."""
         for variant in token.variants:
@@ -261,17 +485,39 @@ class CSSGenerator:
             if variant in self.media_queries:
                 return self.media_queries[variant]
             
-            # Check special media queries
-            if variant == 'dark':
-                return '(prefers-color-scheme: dark)'
-            if variant == 'light':
-                return '(prefers-color-scheme: light)'
-            if variant == 'print':
-                return 'print'
-            if variant == 'motion-safe':
-                return '(prefers-reduced-motion: no-preference)'
-            if variant == 'motion-reduce':
-                return '(prefers-reduced-motion: reduce)'
+            # Check media feature variants
+            if variant in self.MEDIA_FEATURE_VARIANTS:
+                return self.MEDIA_FEATURE_VARIANTS[variant]
+            
+            # Handle arbitrary min-[...] and max-[...]
+            if variant.startswith('min-[') and variant.endswith(']'):
+                value = variant[5:-1]
+                return f'(width >= {value})'
+            if variant.startswith('max-[') and variant.endswith(']'):
+                value = variant[5:-1]
+                return f'(width < {value})'
+            
+            # Handle arbitrary supports-[...]
+            if variant.startswith('supports-[') and variant.endswith(']'):
+                value = variant[10:-1].replace('_', ' ')
+                return f'@supports ({value})'
+        
+        return None
+    
+    def _get_container_query(self, token: TailwindToken) -> Optional[str]:
+        """Get container query string for token variants."""
+        for variant in token.variants:
+            # Check container query variants
+            if variant in self.CONTAINER_QUERIES:
+                return self.CONTAINER_QUERIES[variant]
+            
+            # Handle arbitrary @min-[...] and @max-[...]
+            if variant.startswith('@min-[') and variant.endswith(']'):
+                value = variant[6:-1]
+                return f'(width >= {value})'
+            if variant.startswith('@max-[') and variant.endswith(']'):
+                value = variant[6:-1]
+                return f'(width < {value})'
         
         return None
 

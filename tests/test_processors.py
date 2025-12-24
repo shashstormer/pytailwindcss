@@ -32,7 +32,7 @@ def tw():
     ("invalid", ":invalid"),
     ("first-of-type", ":first-of-type"),
     ("last-of-type", ":last-of-type"),
-    ("only-child", ":only-child"),
+    ("only", ":only-child"),
     ("only-of-type", ":only-of-type"),
     ("empty", ":empty"),
     ("read-only", ":read-only"),
