@@ -81,11 +81,13 @@ class ClassParser:
         'top', 'right', 'bottom', 'left', 'inset',
         'z', 'order',
         # Flexbox/Grid
+        # Flexbox/Grid
         'basis', 'grow', 'shrink',
         'gap', 'gap-x', 'gap-y',
-        'col', 'col-span', 'col-start', 'col-end',
-        'row', 'row-span', 'row-start', 'row-end',
+        'col',
+        'row',
         'grid-cols', 'grid-rows', 'auto-cols', 'auto-rows',
+        'grid-flow',
         'justify', 'items', 'content', 'self', 'place',
         # Typography
         'text', 'font', 'leading', 'tracking', 'indent',
@@ -123,6 +125,7 @@ class ClassParser:
         'visible', 'invisible', 'collapse',
         'start', 'end',
         'not-sr',
+        'auto-cols', 'auto-rows',
     }
     
     def parse(self, class_string: str) -> TailwindToken:

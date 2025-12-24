@@ -548,6 +548,11 @@ class GridColumnsPlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+
         if value is None:
             return None
         return self.create_rule(token, 'grid-template-columns', value)
@@ -581,6 +586,11 @@ class GridRowsPlugin(UtilityPlugin):
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
         value = self.resolve_value(token, context)
+        # Handle variable
+        if value is None and token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             value = f"var({var_name})"
+
         if value is None:
             return None
         return self.create_rule(token, 'grid-template-rows', value)
@@ -1174,6 +1184,265 @@ class SrOnlyPlugin(UtilityPlugin):
        })
 
 
+class GridColumnPlugin(UtilityPlugin):
+    """
+    Plugin for grid-column utilities (col-*).
+    Handles col-span-*, col-start-*, col-end-*, and col-* shorthands.
+    """
+    name = "grid-column"
+    prefixes = ["col"]
+    
+    STATIC_VALUES = {
+        'auto': 'auto',
+        'span-full': '1 / -1',
+    }
+    
+    @property
+    def static_values(self) -> Dict[str, str]:
+         return self.STATIC_VALUES
+         
+    @property
+    def supports_negative(self) -> bool:
+        return True
+
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == 'col'
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        parts = token.value.split('-')
+        subtype = parts[0] if parts else ''
+        
+        # col-span-<value>
+        if subtype == 'span':
+             val_str = "-".join(parts[1:])
+             if val_str == "full":
+                  return self.create_rule(token, 'grid-column', '1 / -1')
+             if val_str.startswith('(') and val_str.endswith(')'):
+                  inner = val_str[1:-1]
+                  return self.create_rule(token, 'grid-column', f"span var({inner}) / span var({inner})")
+             if val_str.isdigit():
+                  return self.create_rule(token, 'grid-column', f"span {val_str} / span {val_str}")
+             if val_str.startswith('[') and val_str.endswith(']'):
+                  raw_val = val_str[1:-1].replace('_', ' ')
+                  return self.create_rule(token, 'grid-column', f"span {raw_val} / span {raw_val}")
+
+        # col-start-<value>
+        elif subtype == 'start':
+             val_str = "-".join(parts[1:])
+             prop = 'grid-column-start'
+             if val_str == 'auto': return self.create_rule(token, prop, 'auto')
+             if val_str.startswith('(') and val_str.endswith(')'):
+                 inner = val_str[1:-1]
+                 return self.create_rule(token, prop, f"var({inner})")
+             if val_str.isdigit():
+                 val = val_str
+                 if token.is_negative: val = f"-{val}"
+                 return self.create_rule(token, prop, val)
+             if val_str.startswith('[') and val_str.endswith(']'):
+                 val = val_str[1:-1].replace('_', ' ')
+                 return self.create_rule(token, prop, val)
+
+        # col-end-<value>
+        elif subtype == 'end':
+             val_str = "-".join(parts[1:])
+             prop = 'grid-column-end'
+             if val_str == 'auto': return self.create_rule(token, prop, 'auto')
+             if val_str.startswith('(') and val_str.endswith(')'):
+                 inner = val_str[1:-1]
+                 return self.create_rule(token, prop, f"var({inner})")
+             if val_str.isdigit():
+                 val = val_str
+                 if token.is_negative: val = f"-{val}"
+                 return self.create_rule(token, prop, val)
+             if val_str.startswith('[') and val_str.endswith(']'):
+                 val = val_str[1:-1].replace('_', ' ')
+                 return self.create_rule(token, prop, val)
+
+        # col-<value> (shorthand)
+        else:
+             if token.value == 'auto':
+                 return self.create_rule(token, 'grid-column', 'auto')
+             if token.value.startswith('(') and token.value.endswith(')'):
+                 inner = token.value[1:-1]
+                 return self.create_rule(token, 'grid-column', f"var({inner})")
+             if token.value.isdigit():
+                 val = token.value
+                 if token.is_negative: val = f"-{val}"
+                 return self.create_rule(token, 'grid-column', val)
+             if token.value.startswith('[') and token.value.endswith(']'):
+                 val = token.value[1:-1].replace('_', ' ')
+                 return self.create_rule(token, 'grid-column', val)
+        return None
+
+class GridRowPlugin(UtilityPlugin):
+    """
+    Plugin for grid-row utilities (row-*).
+    Handles row-span-*, row-start-*, row-end-*, and row-* shorthands.
+    """
+    name = "grid-row"
+    prefixes = ["row"]
+    
+    @property
+    def supports_negative(self) -> bool:
+        return True
+
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == 'row'
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        parts = token.value.split('-')
+        subtype = parts[0] if parts else ''
+        
+        # row-span-<value>
+        if subtype == 'span':
+             val_str = "-".join(parts[1:])
+             if val_str == "full":
+                  return self.create_rule(token, 'grid-row', '1 / -1')
+             if val_str.startswith('(') and val_str.endswith(')'):
+                  inner = val_str[1:-1]
+                  return self.create_rule(token, 'grid-row', f"span var({inner}) / span var({inner})")
+             if val_str.isdigit():
+                  return self.create_rule(token, 'grid-row', f"span {val_str} / span {val_str}")
+             if val_str.startswith('[') and val_str.endswith(']'):
+                  raw_val = val_str[1:-1].replace('_', ' ')
+                  return self.create_rule(token, 'grid-row', f"span {raw_val} / span {raw_val}")
+
+        # row-start-<value>
+        elif subtype == 'start':
+             val_str = "-".join(parts[1:])
+             prop = 'grid-row-start'
+             if val_str == 'auto': return self.create_rule(token, prop, 'auto')
+             if val_str.startswith('(') and val_str.endswith(')'):
+                 inner = val_str[1:-1]
+                 return self.create_rule(token, prop, f"var({inner})")
+             if val_str.isdigit():
+                 val = val_str
+                 if token.is_negative: val = f"-{val}"
+                 return self.create_rule(token, prop, val)
+             if val_str.startswith('[') and val_str.endswith(']'):
+                 val = val_str[1:-1].replace('_', ' ')
+                 return self.create_rule(token, prop, val)
+
+        # row-end-<value>
+        elif subtype == 'end':
+             val_str = "-".join(parts[1:])
+             prop = 'grid-row-end'
+             if val_str == 'auto': return self.create_rule(token, prop, 'auto')
+             if val_str.startswith('(') and val_str.endswith(')'):
+                 inner = val_str[1:-1]
+                 return self.create_rule(token, prop, f"var({inner})")
+             if val_str.isdigit():
+                 val = val_str
+                 if token.is_negative: val = f"-{val}"
+                 return self.create_rule(token, prop, val)
+             if val_str.startswith('[') and val_str.endswith(']'):
+                 val = val_str[1:-1].replace('_', ' ')
+                 return self.create_rule(token, prop, val)
+
+        # row-<value> (shorthand)
+        else:
+             if token.value == 'auto':
+                 return self.create_rule(token, 'grid-row', 'auto')
+             if token.value.startswith('(') and token.value.endswith(')'):
+                 inner = token.value[1:-1]
+                 return self.create_rule(token, 'grid-row', f"var({inner})")
+             if token.value.isdigit():
+                 val = token.value
+                 if token.is_negative: val = f"-{val}"
+                 return self.create_rule(token, 'grid-row', val)
+             if token.value.startswith('[') and token.value.endswith(']'):
+                 val = token.value[1:-1].replace('_', ' ')
+                 return self.create_rule(token, 'grid-row', val)
+        return None
+
+class GridAutoFlowPlugin(UtilityPlugin):
+    """Plugin for grid-auto-flow utilities (grid-flow-*)."""
+    name = "grid-auto-flow"
+    prefixes = ["grid-flow"]
+    
+    STATIC_VALUES = {
+        'row': 'row',
+        'col': 'column',
+        'dense': 'dense',
+        'row-dense': 'row dense',
+        'col-dense': 'column dense',
+    }
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == 'grid-flow' and token.value in self.STATIC_VALUES
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        if token.value in self.STATIC_VALUES:
+            return self.create_rule(token, 'grid-auto-flow', self.STATIC_VALUES[token.value])
+        return None
+
+class GridAutoColumnsPlugin(UtilityPlugin):
+    """Plugin for grid-auto-columns utilities (auto-cols-*)."""
+    name = "grid-auto-columns"
+    prefixes = ["auto-cols"]
+    
+    STATIC_VALUES = {
+        'auto': 'auto',
+        'min': 'min-content',
+        'max': 'max-content',
+        'fr': 'minmax(0, 1fr)',
+    }
+
+    @property
+    def supports_arbitrary(self) -> bool:
+        return True
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == 'auto-cols'
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        # Handle variable
+        if token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             return self.create_rule(token, 'grid-auto-columns', f"var({var_name})")
+             
+        val = self.resolve_value(token, context)
+        if val is None and token.value in self.STATIC_VALUES:
+            val = self.STATIC_VALUES[token.value]
+            
+        if val:
+             return self.create_rule(token, 'grid-auto-columns', val)
+        return None
+
+class GridAutoRowsPlugin(UtilityPlugin):
+    """Plugin for grid-auto-rows utilities (auto-rows-*)."""
+    name = "grid-auto-rows"
+    prefixes = ["auto-rows"]
+    
+    STATIC_VALUES = {
+        'auto': 'auto',
+        'min': 'min-content',
+        'max': 'max-content',
+        'fr': 'minmax(0, 1fr)',
+    }
+
+    @property
+    def supports_arbitrary(self) -> bool:
+        return True
+    
+    def match(self, token: TailwindToken) -> bool:
+        return token.utility == 'auto-rows'
+    
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        # Handle variable
+        if token.value.startswith('(') and token.value.endswith(')'):
+             var_name = token.value[1:-1]
+             return self.create_rule(token, 'grid-auto-rows', f"var({var_name})")
+        
+        val = self.resolve_value(token, context)
+        if val is None and token.value in self.STATIC_VALUES:
+            val = self.STATIC_VALUES[token.value]
+            
+        if val:
+             return self.create_rule(token, 'grid-auto-rows', val)
+        return None
+
+
 def get_plugins() -> List[UtilityPlugin]:
     """Get all layout-related plugins."""
     return [
@@ -1192,6 +1461,11 @@ def get_plugins() -> List[UtilityPlugin]:
         AlignSelfPlugin(),
         GridColumnsPlugin(),
         GridRowsPlugin(),
+        GridColumnPlugin(),
+        GridRowPlugin(),
+        GridAutoFlowPlugin(),
+        GridAutoColumnsPlugin(),
+        GridAutoRowsPlugin(),
         OverflowPlugin(),
         OrderPlugin(),
         AspectRatioPlugin(),
