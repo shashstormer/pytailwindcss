@@ -229,7 +229,16 @@ class UtilityPlugin(ABC):
         if token.value_type == ValueType.ARBITRARY:
             if self.supports_arbitrary:
                 # Strip brackets and process
-                inner = token.value[1:-1] if token.value.startswith('[') else token.value
+                if token.value.startswith('[') and token.value.endswith(']'):
+                    inner = token.value[1:-1]
+                elif token.value.startswith('(') and token.value.endswith(')'):
+                    inner = token.value[1:-1]
+                    # Auto-wrap vars
+                    if inner.startswith('--'):
+                        return f"var({inner})"
+                else:
+                    inner = token.value
+
                 # Replace underscores with spaces (Tailwind convention)
                 inner = self._replace_underscores(inner)
                 return inner

@@ -137,6 +137,15 @@ class TextColorPlugin(ColorPlugin):
                            'wrap', 'nowrap', 'balance', 'pretty',
                            'ellipsis', 'clip'):
             return False
+
+        # Don't match text-(length:...)
+        if token.value.startswith('(') and 'length:' in token.value:
+            return False
+
+        # Don't match fractions (like text-lg/loose)
+        if token.value_type == ValueType.FRACTION:
+            return False
+
         return True
     
     def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
@@ -440,6 +449,45 @@ class CaretColorPlugin(ColorPlugin):
         return self.create_rule(token, 'caret-color', color)
 
 
+class TextDecorationColorPlugin(ColorPlugin):
+    """Plugin for text-decoration color utilities (decoration-*)."""
+
+    name = "text-decoration-color"
+    prefixes = ["decoration"]
+
+    def match(self, token: TailwindToken) -> bool:
+        if token.utility != 'decoration':
+            return False
+        # Don't match style
+        if token.value in ('solid', 'double', 'dotted', 'dashed', 'wavy'):
+            return False
+        # Don't match thickness
+        if token.value in ('auto', 'from-font'):
+            return False
+        if token.value and token.value.replace('.', '').isdigit():
+            return False
+
+        # Don't match arbitrary lengths (e.g. [3px])
+        if token.value_type == ValueType.ARBITRARY:
+            inner = token.value[1:-1]
+            # Check if it looks like a length
+            # Ends with a unit or is a calc
+            if re.search(r'^-?\d*\.?\d+(px|rem|em|%|vh|vw|ch|ex|cm|mm|in|pt|pc)$', inner):
+                return False
+            if inner.startswith('calc('):
+                return False
+
+        return True
+
+    def generate(self, token: TailwindToken, context: GeneratorContext) -> Optional[Rule]:
+        color = self.resolve_color_value(token, context)
+        if color is None:
+            return None
+
+        color = self.apply_opacity(color, token.opacity)
+        return self.create_rule(token, 'text-decoration-color', color)
+
+
 def get_plugins() -> List[UtilityPlugin]:
     """Get all color-related plugins."""
     return [
@@ -454,4 +502,5 @@ def get_plugins() -> List[UtilityPlugin]:
         StrokeColorPlugin(),
         AccentColorPlugin(),
         CaretColorPlugin(),
+        TextDecorationColorPlugin(),
     ]

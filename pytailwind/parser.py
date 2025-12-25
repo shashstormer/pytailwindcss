@@ -229,21 +229,27 @@ class ClassParser:
     
     def _split_by_colon_respecting_brackets(self, text: str) -> List[str]:
         """
-        Split text by colon, but not inside brackets.
+        Split text by colon, but not inside brackets or parentheses.
         
         "hover:bg-[#ff0000]" -> ["hover", "bg-[#ff0000]"]
         "[mask-type:luminance]" -> ["[mask-type:luminance]"]
+        "font-(family-name:--my-font)" -> ["font-(family-name:--my-font)"]
         """
         parts = []
         current = []
         bracket_depth = 0
+        paren_depth = 0
         
         for char in text:
             if char == '[':
                 bracket_depth += 1
             elif char == ']':
                 bracket_depth -= 1
-            elif char == ':' and bracket_depth == 0:
+            elif char == '(':
+                paren_depth += 1
+            elif char == ')':
+                paren_depth -= 1
+            elif char == ':' and bracket_depth == 0 and paren_depth == 0:
                 parts.append(''.join(current))
                 current = []
                 continue
@@ -289,6 +295,8 @@ class ClassParser:
             
             # Determine value type
             if value.startswith('[') and value.endswith(']'):
+                value_type = ValueType.ARBITRARY
+            elif value.startswith('(') and value.endswith(')'):
                 value_type = ValueType.ARBITRARY
             elif '/' in value and not value.startswith('['):
                 value_type = ValueType.FRACTION
