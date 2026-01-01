@@ -4,6 +4,44 @@ CLASSES = {
             "accentColor": {
                 "auto": 'auto',
             },
+            "alignItems": {
+                "start": "flex-start",
+                "end": "flex-end",
+                "center": "center",
+                "baseline": "baseline",
+                "stretch": "stretch",
+            },
+            "justifyContent": {
+                "start": "flex-start",
+                "end": "flex-end",
+                "center": "center",
+                "between": "space-between",
+                "around": "space-around",
+                "evenly": "space-evenly",
+            },
+            "flexDirection": {
+                "row": "row",
+                "row-reverse": "row-reverse",
+                "col": "column",
+                "col-reverse": "column-reverse",
+            },
+            "flexWrap": {
+                "wrap": "wrap",
+                "wrap-reverse": "wrap-reverse",
+                "nowrap": "nowrap",
+            },
+            "borderStyle": {
+                "solid": "solid",
+                "dashed": "dashed",
+                "dotted": "dotted",
+                "double": "double",
+                "hidden": "hidden",
+                "none": "none",
+            },
+            "top": SPACING,
+            "right": SPACING,
+            "bottom": SPACING,
+            "left": SPACING,
             "animationNames": {
                 "none": 'none',
                 "spin": 'spin 1s linear var(--tw-animation-count, infinite)',
@@ -1393,7 +1431,19 @@ EXTEND_CLASSES = [
             ["size", "spacing"],
             ["width", "spacing"],
             ["accentColor", "colors"],
+            ["minWidth", "spacing"],
+            ["ringColor", "colors"],
+            ["ringOpacity", "opacity"],
+            ["stroke", "colors"],
+            ["translate", "spacing"],
+            ["size", "spacing"],
+            ["width", "spacing"],
+            ["accentColor", "colors"],
             ["height", "spacing"],
+            ["top", "inset"],
+            ["right", "inset"],
+            ["bottom", "inset"],
+            ["left", "inset"],
             # ["", ""],
         ]
 
@@ -1484,6 +1534,7 @@ for i, j in [["m", "margin"], ["p", "padding"]]:
         CLASSES[j + y.capitalize()] = CLASSES[j]
         DYNAMIC_VALUE[i + x] = j + "-" + y
 
+
 MULTI_REQUIREMENT = {
     "marginLeftRight": ["marginRight"],
     "marginTopBottom": ["marginBottom"],
@@ -1500,15 +1551,22 @@ MULTI_REQUIREMENT = {
     "roundedBottomRight": ["borderBottomRightRadius"],
     "roundedBottomLeft": ["borderBottomLeftRadius"],
     "border": ["borderWidth"],
-    "itemsCenter": ["alignItems"],
-    "justifyCenter": ["justifyContent"],
-    "contentCenter": ["alignContent"],
-    "placeContentCenter": ["alignContent", "justifyContent"],
     "gridCols": ["gridTemplateColumns"],
     "gridRows": ["gridTemplateRows"],
     "text": ["color"],
     "font": ["fontFamily"],
     "leading": ["lineHeight"],
+}
+CLASSES["whitespace"] = {
+    "normal": "normal",
+    "nowrap": "nowrap",
+    "pre": "pre",
+    "pre-line": "pre-line",
+    "pre-wrap": "pre-wrap",
+    "break-spaces": "break-spaces",
+}
+CLASSES["truncate"] = {
+    "DEFAULT": [{"overflow": "hidden"}, {"text-overflow": "ellipsis"}, {"white-space": "nowrap"}]
 }
 for i, j in MULTI_REQUIREMENT.items():
     CLASSES[i] = {}

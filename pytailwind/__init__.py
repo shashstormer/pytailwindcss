@@ -44,6 +44,67 @@ class Tailwind:
                 lis.append(i)
         return lis
 
+    def _resolve_properties(self, i):
+        processors = []
+        if ":" in i:
+            k = i.split(":")
+            i = k[-1]
+            k.pop()
+            processors = k
+        j = i.split("-")
+        jz = self.merge_first_term(j)
+        for j2, j3 in jz:
+            j = [j2]
+            j.extend(j3)
+            gps = self._tailwind_gps_matched(j[0])
+            for gp in gps:
+                res = ""
+                gp_res = ""
+                if len(j) == 1:
+                    res = self.classes[gp].get(j[0], "")
+                    if not res:
+                        res = self.classes[gp].get("DEFAULT", "")
+                    if res:
+                        gp_res = gp
+                if len(j) == 2:
+                    if gp == "filter":
+                        if "filter" not in j:
+                            j.insert(0, "filter")
+                    res = self.classes[gp].get(j[1], "")
+                    if isinstance(res, dict):
+                        res = res.get("DEFAULT", "")
+                    if j[-1].startswith("["):
+                        gp_res = self.dynamic_value.get(j[0], "")
+                        if gp_res:
+                            res = j[-1].replace("[", "").replace("]", "")
+                            if gp_res in self.multi_requirement:
+                                res = [res]
+                                for z in self.multi_requirement[gp_res]:
+                                    res.append({z: res[0]})
+                        else:
+                            if not res:
+                                res = j[-1].replace("[", "").replace("]", "")
+                    if res and not gp_res:
+                        gp_res = gp
+                if len(j) == 3:
+                    res = self.classes[gp].get(j[1], {}).get(j[2], "")
+                    if j[-1].startswith("["):
+                        if not res:
+                            res = j[-1].replace("[", "").replace("]", "")
+                    if res and not gp_res:
+                        gp_res = gp
+                if len(j) == 4:
+                    res = self.classes[gp].get(j[1], {}).get(j[2], {}).get(j[3], "")
+                    if j[-1].startswith("["):
+                        if not res:
+                            res = j[-1].replace("[", "").replace("]", "")
+                    if res and not gp_res:
+                        gp_res = gp
+                
+                if res:
+                    return res, gp_res, processors
+        return None, None, []
+
     def generate(self, page_content):
         match_classes = re.compile('class\s*=\s*["\']([^"\']+)["\']')
         class_list = match_classes.findall(page_content)
@@ -56,91 +117,40 @@ class Tailwind:
                     classes_list.append(j)
         for i in classes_list:
             ori_i = i
-            opacity = i.split("/", 1)
-            opacity_text = ""
-            if len(opacity) == 2:
-                try:
-                    ori_op = opacity
-                    opacity = int(opacity[-1])
-                    i = ori_op[0]
-                    opacity_text = f"/{opacity}"
-                except Exception as e:
-                    i = ori_op[0]
-                    opacity = 100
-            else:
-                opacity = 100
-            processors = []
-            if ":" in i:
-                k = i.split(":")
-                i = k[-1]
-                k.pop()
-                processors = k
-            j = i.split("-")
-            jz = self.merge_first_term(j)
-            for j2, j3 in jz:
-                j = [j2]
-                j.extend(j3)
-                gps = self._tailwind_gps_matched(j[0])
-                for gp in gps:
-                    res = ""
-                    gp_res = ""
-                    if len(j) == 1:
-                        res = self.classes[gp].get(j[0], "")
-                        if not res:
-                            res = self.classes[gp].get("DEFAULT", "")
-                        if res:
-                            gp_res = gp
-                    if len(j) == 2:
-                        if gp == "filter":
-                            if "filter" not in j:
-                                j.insert(0, "filter")
-                        res = self.classes[gp].get(j[1], "")
-                        if isinstance(res, dict):
-                            res = res.get("DEFAULT", "")
-                        if j[-1].startswith("["):
-                            gp_res = self.dynamic_value.get(j[0], "")
-                            if gp_res:
-                                res = j[-1].replace("[", "").replace("]", "")
-                                if gp_res in self.multi_requirement:
-                                    res = [res]
-                                    for z in self.multi_requirement[gp_res]:
-                                        res.append({z: res[0]})
-                            else:
-                                if not res:
-                                    res = j[-1].replace("[", "").replace("]", "")
-                        if res:
-                            gp_res = gp
-                    if len(j) == 3:
-                        res = self.classes[gp].get(j[1], {}).get(j[2], "")
-                        if j[-1].startswith("["):
-                            if not res:
-                                res = j[-1].replace("[", "").replace("]", "")
-                        if res:
-                            gp_res = gp
-                    if len(j) == 4:
-                        res = self.classes[gp].get(j[1], {}).get(j[2], {}).get(j[3], "")
-                        if j[-1].startswith("["):
-                            if not res:
-                                res = j[-1].replace("[", "").replace("]", "")
-                        if res:
-                            gp_res = gp
-                    if res:
-                        if (isinstance(res, str) or (isinstance(res, list) and isinstance(res[0], str))) and gp not in [
-                                "from", "to", "via"]:
-                            result_css_to_add = (".%s {%s: %s;}" %
-                                                 (
-                                                     self.sanitize_class_name(ori_i),
-                                                     self.to_css_name.get(gp_res, gp_res),
-                                                     self.normalize_property_value(res)
-                                                 )
-                                                 )
-                        else:
-                            result_css_to_add = ".%s {%s}" % (
-                                self.sanitize_class_name(ori_i), self.normalize_property_value(res))
-                        result_css_to_add = self.process_result_value(result_css_to_add, processors)
-                        if opacity < 100:
-                            result_css_to_add = self.process_opacity(result_css_to_add, opacity)
-                        result_css[self.sanitize_class_name(ori_i)] = result_css_to_add
+            res, gp_res, processors = self._resolve_properties(i)
+            opacity = 100
+            
+            if not res and "/" in i:
+                parts = i.split("/", 1)
+                if len(parts) == 2:
+                    try:
+                        possible_opacity = int(parts[1])
+                        base_res, base_gp, base_proc = self._resolve_properties(parts[0])
+                        if base_res:
+                            res = base_res
+                            gp_res = base_gp
+                            processors = base_proc
+                            opacity = possible_opacity
+                    except ValueError:
+                        pass
+            
+            if res:
+                if (isinstance(res, str) or (isinstance(res, list) and isinstance(res[0], str))) and gp_res not in [
+                        "from", "to", "via"]:
+                    result_css_to_add = (".%s {%s: %s;}" %
+                                         (
+                                             self.sanitize_class_name(ori_i),
+                                             self.to_css_name.get(gp_res, gp_res),
+                                             self.normalize_property_value(res)
+                                         )
+                                         )
+                else:
+                    result_css_to_add = ".%s {%s}" % (
+                        self.sanitize_class_name(ori_i), self.normalize_property_value(res))
+                result_css_to_add = self.process_result_value(result_css_to_add, processors)
+                if opacity < 100:
+                    result_css_to_add = self.process_opacity(result_css_to_add, opacity)
+                result_css[self.sanitize_class_name(ori_i)] = result_css_to_add
         from_vals = [result_css[k] for k in result_css if "from-" in k]
         via_vals = [result_css[k] for k in result_css if "via-" in k]
         to_vals = [result_css[k] for k in result_css if "to-" in k]
@@ -416,7 +426,7 @@ class Tailwind:
     @staticmethod
     def sanitize_class_name(name):
         name = (name.replace("[", "\\[").replace("]", "\\]").replace("%", "\\%").replace(":", "\\:")
-                .replace("/", "\\/").replace("(", "\\(").replace(")", "\\)").replace("#", "\\#").replace(",", "\\,"))
+                .replace("/", "\\/").replace("(", "\\(").replace(")", "\\)").replace("#", "\\#").replace(",", "\\,").replace(".", "\\."))
         if name.startswith("space-x") or name.startswith("space-y"):
             name += " > * + *"
         return name
@@ -430,8 +440,10 @@ class Tailwind:
                     for key in value[1]:
                         result += self.to_css_name.get(key, key) + ":" + value[1][key] + ";"
             elif isinstance(value[0], dict):
-                for key in value[0]:
-                    result += self.to_css_name.get(key, key) + ":" + value[0][key] + ";"
+                for item in value:
+                    if isinstance(item, dict):
+                        for key in item:
+                            result += self.to_css_name.get(key, key) + ":" + item[key] + ";"
             else:
                 for i in value:
                     if not isinstance(i, str):

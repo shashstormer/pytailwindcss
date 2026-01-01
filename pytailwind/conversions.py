@@ -136,6 +136,17 @@ TO_CSS_NAME = {
     "textIndent": "text-indent",
     "textOpacity": "text-opacity",
     "textDecoration": "text-decoration",
+    "whitespace": "white-space",
+    "truncate": "truncate",
+    "alignItems": "align-items",
+    "justifyContent": "justify-content",
+    "flexDirection": "flex-direction",
+    "flexWrap": "flex-wrap",
+    "top": "top",
+    "right": "right",
+    "bottom": "bottom",
+    "left": "left",
+    "borderStyle": "border-style",
 }
 TO_TAILWIND_NAME = {
     "animationNames": "animate",
@@ -286,6 +297,15 @@ TO_TAILWIND_NAME = {
     "width": "w",
     "willChange": "will-change",
     "zIndex": "z",
+    "alignItems": "items",
+    "justifyContent": "justify",
+    "flexDirection": "flex",
+    "flexWrap": "flex",
+    "top": "top",
+    "right": "right",
+    "bottom": "bottom",
+    "left": "left",
+    "borderStyle": "border",
 
     "backgroundColor": "bg",
     "backgroundOpacity": "bg-opacity",
@@ -324,5 +344,7 @@ TO_TAILWIND_NAME = {
         "overline",  # Overline
         "line-through",  # Line through
         "blink",  # Blink (not widely supported),
-    ]
+    ],
+    "whitespace": "whitespace",
+    "truncate": "truncate",
 }
