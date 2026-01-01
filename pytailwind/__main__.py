@@ -28,7 +28,7 @@ def main():
             with open(args.input, "r") as f:
                 content = f.read()
 
-        css = tailwind.generate(content)
+        css = tailwind.generate(content, minify=args.minify)
 
         with open(args.output, "w") as f:
             f.write(css)

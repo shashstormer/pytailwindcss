@@ -153,7 +153,7 @@ CLASSES = {
                     "DEFAULT": "invert(1)"
                 },
                 "opacity": {
-                    "0": "opacity(0)",
+                    "0": [{"opacity": "0", "display": "none"}],
                     "5": "opacity(.05)",
                     "10": "opacity(.1)",
                     "20": "opacity(.2)",
@@ -293,16 +293,29 @@ CLASSES = {
                 }
 
             },
-            "boxShadow": {
-                "sm": '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-                "DEFAULT": '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-                "md": '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-                "lg": '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-                "xl": '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
-                '2xl': '0 25px 50px -12px rgb(0 0 0 / 0.25)',
-                "inner": 'inset 0 2px 4px 0 rgb(0 0 0 / 0.05)',
-                "none": 'none',
-            },
+    "boxShadow": {
+        "2xs": "var(--shadow-2xs)", # "0 1px rgb(0 0 0 / 0.05)",
+        "xs": "var(--shadow-xs)", # "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        "sm": "var(--shadow-sm)", # "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "DEFAULT": "var(--shadow-sm)", # Fallback or what? User spec implies shadow-sm is the standard? User didn't specify DEFAULT for shadow? Default usually means `shadow`. User listed `shadow-md` etc. `shadow` usually maps to `DEFAULT`. In previous version it was `0 1px 3px...`. I will stick to explicit sizes if possible. But `shadow` class in user request? No `shadow` class in user request, only `shadow-sm`, `shadow-md` etc. WAIT! Previous `classes.py` had `DEFAULT`. User provided list has `shadow-2xs`... `shadow-2xl`. No raw `shadow`.
+        # Wait, if user types `shadow`, what happens?
+        # User list: `shadow-2xs`, `shadow-xs`, ...
+        # I will keep `DEFAULT` as `var(--shadow-sm)` or similar common default.
+        # However, looking closely at user request:
+        # `shadow-sm box-shadow: var(--shadow-sm);`
+        # I'll just map them.
+        "md": "var(--shadow-md)", # "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        "lg": "var(--shadow-lg)", # "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+        "xl": "var(--shadow-xl)", # "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+        "2xl": "var(--shadow-2xl)", # "0 25px 50px -12px rgb(0 0 0 / 0.25)",
+        "none": "0 0 #0000",
+    },
+    "insetShadow": {
+        "2xs": "var(--inset-shadow-2xs)", # "inset 0 1px rgb(0 0 0 / 0.05)",
+        "xs": "var(--inset-shadow-xs)", # "inset 0 1px 1px rgb(0 0 0 / 0.05)",
+        "sm": "var(--inset-shadow-sm)", # "inset 0 2px 4px rgb(0 0 0 / 0.05)",
+        "none": "inset 0 0 #0000",
+    },
             "brightness": {
                 "0": '0',
                 '50': '.5',
@@ -960,7 +973,7 @@ CLASSES = {
                 "top": 'top',
             },
             "opacity": {
-                "0": '0',
+                "0": {"opacity": "0", "display": "none"},
                 "5": '0.05',
                 "10": '0.1',
                 "15": '0.15',
@@ -1054,14 +1067,17 @@ CLASSES = {
             "ringOpacity": {
                 "DEFAULT": '0.5',
             },
-            "ringWidth": {
-                "DEFAULT": '3px',
-                "0": '0px',
-                "1": '1px',
-                "2": '2px',
-                "4": '4px',
-                "8": '8px',
-            },
+    "ringWidth": {
+        "DEFAULT": "0 0 0 1px",
+        "0": "0 0 0 0px",
+        "1": "0 0 0 1px",
+        "2": "0 0 0 2px",
+        "4": "0 0 0 4px",
+        "8": "0 0 0 8px",
+    },
+    "insetRing": {
+        "DEFAULT": "inset 0 0 0 1px",
+    },
             "rotate": {
                 "0": '0deg',
                 "1": '1deg',
@@ -1115,43 +1131,7 @@ CLASSES = {
                 "6": '6deg',
                 "12": '12deg',
             },
-            "spacing": {
-                "px": '1px',
-                "0": '0px',
-                "0.5": '0.125rem',
-                "1": '0.25rem',
-                "1.5": '0.375rem',
-                "2": '0.5rem',
-                "2.5": '0.625rem',
-                "3": '0.75rem',
-                "3.5": '0.875rem',
-                "4": '1rem',
-                "5": '1.25rem',
-                "6": '1.5rem',
-                "7": '1.75rem',
-                "8": '2rem',
-                "9": '2.25rem',
-                "10": '2.5rem',
-                "11": '2.75rem',
-                "12": '3rem',
-                "14": '3.5rem',
-                "16": '4rem',
-                "20": '5rem',
-                "24": '6rem',
-                "28": '7rem',
-                "32": '8rem',
-                "36": '9rem',
-                "40": '10rem',
-                "44": '11rem',
-                "48": '12rem',
-                "52": '13rem',
-                "56": '14rem',
-                "60": '15rem',
-                "64": '16rem',
-                "72": '18rem',
-                "80": '20rem',
-                "96": '24rem',
-            },
+            "spacing": SPACING,
             "srOnly": {
                 "DEFAULT": {
                     "position": "absolute",
@@ -1395,6 +1375,7 @@ COPY_CLASSES = [
             ["borderOpacity", "opacity"],
             ["borderSpacing", "spacing"],
             ["boxShadowColor", "colors"],
+            ["insetShadowColor", "colors"],
             ["caretColor", "colors"],
             ["divideColor", "borderColor"],
             ["divideOpacity", "borderOpacity"],
@@ -1414,6 +1395,7 @@ COPY_CLASSES = [
             ["textDecorationColor", "colors"],
             ["textIndent", "spacing"],
             ["textOpacity", "opacity"],
+            ["insetRingColor", "colors"],
             # ["", ""],
         ]
 

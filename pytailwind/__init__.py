@@ -1,4 +1,5 @@
 import re
+import html
 from .classes import CLASSES, DYNAMIC_VALUE, MULTI_REQUIREMENT
 from .defaults import COLORS, SPACING
 from .conversions import  TO_CSS_NAME, TO_TAILWIND_NAME
@@ -72,9 +73,29 @@ class Tailwind:
                             j.insert(0, "filter")
                     res = self.classes[gp].get(j[1], "")
                     if isinstance(res, dict):
-                        res = res.get("DEFAULT", "")
+                        if "DEFAULT" in res:
+                            res = res.get("DEFAULT", "")
                     if j[-1].startswith("["):
                         gp_res = self.dynamic_value.get(j[0], "")
+                        
+                        val = j[-1].replace("[", "").replace("]", "")
+                        if j[0] == "text":
+                            if any(unit in val for unit in ["px", "rem", "em", "%", "vh", "vw"]) or val.isdigit():
+                                gp_res = "fontSize"
+                            else:
+                                gp_res = "color"
+                        elif j[0] == "border":
+                            if any(unit in val for unit in ["px", "rem", "em", "%"]) or val.isdigit():
+                                gp_res = "borderWidth"
+                            else:
+                                gp_res = "borderColor"
+                        elif j[0] == "bg":
+                             if "url" in val:
+                                gp_res = "backgroundImage"
+                             elif any(unit in val for unit in ["px", "rem", "em", "%"]) or val.isdigit():
+                                gp_res = "backgroundSize" # or position, but usually bg-[size]
+                             else:
+                                gp_res = "backgroundColor"
                         if gp_res:
                             res = j[-1].replace("[", "").replace("]", "")
                             if gp_res in self.multi_requirement:
@@ -105,12 +126,15 @@ class Tailwind:
                     return res, gp_res, processors
         return None, None, []
 
-    def generate(self, page_content):
-        match_classes = re.compile('class\s*=\s*["\']([^"\']+)["\']')
+
+
+    def generate(self, page_content, minify=True):
+        match_classes = re.compile(r'(?:class|className)\s*=\s*["\']([^"\']+)["\']')
         class_list = match_classes.findall(page_content)
         classes_list = []
         result_css = {}
         for i in class_list:
+            i = html.unescape(i)
             i = i.split()
             for j in i:
                 if j not in classes_list:
@@ -137,17 +161,35 @@ class Tailwind:
             if res:
                 if (isinstance(res, str) or (isinstance(res, list) and isinstance(res[0], str))) and gp_res not in [
                         "from", "to", "via"]:
-                    result_css_to_add = (".%s {%s: %s;}" %
-                                         (
-                                             self.sanitize_class_name(ori_i),
-                                             self.to_css_name.get(gp_res, gp_res),
-                                             self.normalize_property_value(res)
-                                         )
-                                         )
+                    if minify:
+                        result_css_to_add = (".%s {%s: %s;}" %
+                                            (
+                                                self.sanitize_class_name(ori_i),
+                                                self.to_css_name.get(gp_res, gp_res),
+                                                self.normalize_property_value(res)
+                                            )
+                                            )
+                    else:
+                        result_css_to_add = ".%s {\n    %s: %s;\n}" % (
+                            self.sanitize_class_name(ori_i),
+                            self.to_css_name.get(gp_res, gp_res),
+                            self.normalize_property_value(res)
+                        )
+
                 else:
-                    result_css_to_add = ".%s {%s}" % (
-                        self.sanitize_class_name(ori_i), self.normalize_property_value(res))
-                result_css_to_add = self.process_result_value(result_css_to_add, processors)
+                    if minify:
+                        result_css_to_add = ".%s {%s}" % (
+                            self.sanitize_class_name(ori_i), self.normalize_property_value(res))
+                    else:
+                        css_val = self.normalize_property_value(res)
+                        if ";" in css_val:
+                            props = [p.strip() for p in css_val.split(";") if p.strip()]
+                            formatted_props = "\n".join(f"    {p};" for p in props)
+                            result_css_to_add = f".{self.sanitize_class_name(ori_i)} {{\n{formatted_props}\n}}"
+                        else:
+                            result_css_to_add = f".{self.sanitize_class_name(ori_i)} {{\n    {css_val}\n}}"
+
+                result_css_to_add = self.process_result_value(result_css_to_add, processors, minify=minify)
                 if opacity < 100:
                     result_css_to_add = self.process_opacity(result_css_to_add, opacity)
                 result_css[self.sanitize_class_name(ori_i)] = result_css_to_add
@@ -162,7 +204,9 @@ class Tailwind:
             vals.append(result_css[key])
             del result_css[key]
         vals = vals + from_vals + via_vals + to_vals
-        return "".join(vals)
+        
+        separator = "" if minify else "\n"
+        return separator.join(vals)
 
     def process_opacity(self, css_class, opacity):
         hex_regex = re.compile(r"[ '\"]#[0-9a-fA-F]{3,8}")
@@ -192,7 +236,7 @@ class Tailwind:
         return [r, g, b, a]
 
     @staticmethod
-    def process_result_value(result, processors):
+    def process_result_value(result, processors, minify=True):
         fin = ""
         # List of Media Query Processors
         media_query_processors = [
@@ -277,121 +321,136 @@ class Tailwind:
 
         # Process the result based on the ordered processors
         for processor in processors_ordered:
+            nl = "" if minify else "\n"
+            indent = "" if minify else "    "
+            
+            def format_block(wrapper_start, content, wrapper_end="}"):
+                if minify:
+                    return f"{wrapper_start}{{{content}{wrapper_end}"
+                else:
+                    indented_content = content.replace("\n", "\n    ")
+                    return f"{wrapper_start} {{\n    {indented_content}\n{wrapper_end}"
+
             if processor == "dark":
-                fin = "@media (prefers-color-scheme: dark) {%s}" % result
+                fin = format_block("@media (prefers-color-scheme: dark)", result)
             elif processor == "light":
-                fin = "@media (prefers-color-scheme: light) {%s}" % result
+                fin = format_block("@media (prefers-color-scheme: light)", result)
             elif processor == "hover":
-                result = result.split(" {", 1)
-                fin = result[0] + ":hover {" + result[1]
+                if minify:
+                     parts = result.split(" {", 1)
+                     fin = parts[0] + ":hover {" + parts[1]
+                else:
+                     parts = result.split(" {", 1)
+                     fin = parts[0] + ":hover {" + parts[1]
+
             elif processor == "focus":
-                result = result.split(" {", 1)
-                fin = result[0] + ":focus {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":focus {" + parts[1]
             elif processor == "active":
-                result = result.split(" {", 1)
-                fin = result[0] + ":active {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":active {" + parts[1]
             elif processor == "visited":
-                result = result.split(" {", 1)
-                fin = result[0] + ":visited {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":visited {" + parts[1]
             elif processor == "first":
-                result = result.split(" {", 1)
-                fin = result[0] + ":first-child {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":first-child {" + parts[1]
             elif processor == "last":
-                result = result.split(" {", 1)
-                fin = result[0] + ":last-child {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":last-child {" + parts[1]
             elif processor == "odd":
-                result = result.split(" {", 1)
-                fin = result[0] + ":nth-child(odd) {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":nth-child(odd) {" + parts[1]
             elif processor == "even":
-                result = result.split(" {", 1)
-                fin = result[0] + ":nth-child(even) {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":nth-child(even) {" + parts[1]
             elif processor == "disabled":
-                result = result.split(" {", 1)
-                fin = result[0] + ":disabled {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":disabled {" + parts[1]
             elif processor == "group-hover":
-                result = result.split(" {", 1)
-                fin = ".group:hover " + result[0] + " {" + result[1]
+                parts = result.split(" {", 1)
+                fin = ".group:hover " + parts[0] + " {" + parts[1]
             elif processor == "focus-within":
-                result = result.split(" {", 1)
-                fin = result[0] + ":focus-within {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":focus-within {" + parts[1]
             elif processor == "focus-visible":
-                result = result.split(" {", 1)
-                fin = result[0] + ":focus-visible {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":focus-visible {" + parts[1]
             elif processor == "checked":
-                result = result.split(" {", 1)
-                fin = result[0] + ":checked {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":checked {" + parts[1]
             elif processor == "required":
-                result = result.split(" {", 1)
-                fin = result[0] + ":required {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":required {" + parts[1]
             elif processor == "invalid":
-                result = result.split(" {", 1)
-                fin = result[0] + ":invalid {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":invalid {" + parts[1]
             elif processor == "before":
-                result = result.split(" {", 1)
-                fin = result[0] + "::before {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + "::before {" + parts[1]
             elif processor == "after":
-                result = result.split(" {", 1)
-                fin = result[0] + "::after {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + "::after {" + parts[1]
             elif processor == "first-of-type":
-                result = result.split(" {", 1)
-                fin = result[0] + ":first-of-type {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":first-of-type {" + parts[1]
             elif processor == "last-of-type":
-                result = result.split(" {", 1)
-                fin = result[0] + ":last-of-type {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":last-of-type {" + parts[1]
             elif processor == "only-child":
-                result = result.split(" {", 1)
-                fin = result[0] + ":only-child {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":only-child {" + parts[1]
             elif processor == "only-of-type":
-                result = result.split(" {", 1)
-                fin = result[0] + ":only-of-type {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":only-of-type {" + parts[1]
             elif processor == "empty":
-                result = result.split(" {", 1)
-                fin = result[0] + ":empty {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":empty {" + parts[1]
             elif processor == "read-only":
-                result = result.split(" {", 1)
-                fin = result[0] + ":read-only {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":read-only {" + parts[1]
             elif processor == "placeholder-shown":
-                result = result.split(" {", 1)
-                fin = result[0] + ":placeholder-shown {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":placeholder-shown {" + parts[1]
             elif processor == "not-first":
-                result = result.split(" {", 1)
-                fin = result[0] + ":not(:first-child) {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":not(:first-child) {" + parts[1]
             elif processor == "not-last":
-                result = result.split(" {", 1)
-                fin = result[0] + ":not(:last-child) {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":not(:last-child) {" + parts[1]
             elif processor == "not-disabled":
-                result = result.split(" {", 1)
-                fin = result[0] + ":not(:disabled) {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":not(:disabled) {" + parts[1]
             elif processor == "not-checked":
-                result = result.split(" {", 1)
-                fin = result[0] + ":not(:checked) {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":not(:checked) {" + parts[1]
             elif processor == "not-odd":
-                result = result.split(" {", 1)
-                fin = result[0] + ":not(:nth-child(odd)) {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":not(:nth-child(odd)) {" + parts[1]
             elif processor == "not-even":
-                result = result.split(" {", 1)
-                fin = result[0] + ":not(:nth-child(even)) {" + result[1]
+                parts = result.split(" {", 1)
+                fin = parts[0] + ":not(:nth-child(even)) {" + parts[1]
             elif processor == "peer-hover":
-                result = result.split(" {", 1)
-                fin = ".peer:hover ~ " + result[0] + " {" + result[1]
+                parts = result.split(" {", 1)
+                fin = ".peer:hover ~ " + parts[0] + " {" + parts[1]
             elif processor == "peer-focus":
-                result = result.split(" {", 1)
-                fin = ".peer:focus ~ " + result[0] + " {" + result[1]
+                parts = result.split(" {", 1)
+                fin = ".peer:focus ~ " + parts[0] + " {" + parts[1]
             elif processor == "peer-active":
-                result = result.split(" {", 1)
-                fin = ".peer:active ~ " + result[0] + " {" + result[1]
+                parts = result.split(" {", 1)
+                fin = ".peer:active ~ " + parts[0] + " {" + parts[1]
             elif processor == "peer-checked":
-                result = result.split(" {", 1)
-                fin = ".peer:checked ~ " + result[0] + " {" + result[1]
+                parts = result.split(" {", 1)
+                fin = ".peer:checked ~ " + parts[0] + " {" + parts[1]
             elif processor == "peer-required":
-                result = result.split(" {", 1)
-                fin = ".peer:required ~ " + result[0] + " {" + result[1]
+                parts = result.split(" {", 1)
+                fin = ".peer:required ~ " + parts[0] + " {" + parts[1]
             elif processor == "peer-invalid":
-                result = result.split(" {", 1)
-                fin = ".peer:invalid ~ " + result[0] + " {" + result[1]
+                parts = result.split(" {", 1)
+                fin = ".peer:invalid ~ " + parts[0] + " {" + parts[1]
             elif processor == "peer-placeholder-shown":
-                result = result.split(" {", 1)
-                fin = ".peer:placeholder-shown ~ " + result[0] + " {" + result[1]
+                parts = result.split(" {", 1)
+                fin = ".peer:placeholder-shown ~ " + parts[0] + " {" + parts[1]
             elif processor in ["sm", "md", "lg", "xl", "2xl", "xs", "max-xs", "max-sm", "max-md", "max-lg", "max-xl", "max-2xl"]:
                 media_queries = {
                     "xs": "(min-width: 425px)",
@@ -407,13 +466,13 @@ class Tailwind:
                     "max-xl": "(max-width: 1280px)",
                     "max-2xl": "(max-width: 1536px)",
                 }
-                fin = "@media %s {%s}" % (media_queries[processor], result)
+                fin = format_block(f"@media {media_queries[processor]}", result)
             elif processor == "motion-safe":
-                fin = "@media (prefers-reduced-motion: no-preference) {%s}" % result
+                fin = format_block("@media (prefers-reduced-motion: no-preference)", result)
             elif processor == "motion-reduce":
-                fin = "@media (prefers-reduced-motion: reduce) {%s}" % result
+                fin = format_block("@media (prefers-reduced-motion: reduce)", result)
             elif processor == "print":
-                fin = "@media print {%s}" % result
+                 fin = format_block("@media print", result)
             else:
                 print("UNDEFINED PROCESSSOR :", processor)
                 return ""
@@ -426,7 +485,7 @@ class Tailwind:
     @staticmethod
     def sanitize_class_name(name):
         name = (name.replace("[", "\\[").replace("]", "\\]").replace("%", "\\%").replace(":", "\\:")
-                .replace("/", "\\/").replace("(", "\\(").replace(")", "\\)").replace("#", "\\#").replace(",", "\\,").replace(".", "\\."))
+                .replace("/", "\\/").replace("(", "\\(").replace(")", "\\)").replace("#", "\\#").replace(",", "\\,").replace(".", "\\.").replace("&", "\&"))
         if name.startswith("space-x") or name.startswith("space-y"):
             name += " > * + *"
         return name
