@@ -1,5 +1,5 @@
 
-COLORS = {
+RAW_COLORS = {
             "inherit": 'inherit',
             "current": 'currentColor',
             "transparent": 'transparent',
@@ -293,7 +293,7 @@ COLORS = {
             }
         }
 
-SPACING = {
+RAW_SPACING = {
             "px": '1px',
             "0": '0px',
             "0.5": '0.125rem',
@@ -330,3 +330,27 @@ SPACING = {
             "80": '20rem',
             "96": '24rem',
         }
+
+COLORS = {}
+SPACING = {}
+
+# Process COLORS
+for key, value in RAW_COLORS.items():
+    if isinstance(value, dict):
+        COLORS[key] = {}
+        for subkey, subvalue in value.items():
+            COLORS[key][subkey] = f"var(--color-{key}-{subkey})"
+    else:
+        if key in ["inherit", "current", "transparent"]:
+             COLORS[key] = value
+        else:
+             COLORS[key] = f"var(--color-{key})"
+
+# Process SPACING
+for key, value in RAW_SPACING.items():
+    if key == "px":
+        SPACING[key] = "1px"
+    elif key == "0":
+        SPACING[key] = "0px" # or calc(var(--spacing) * 0)
+    else:
+        SPACING[key] = f"calc(var(--spacing) * {key})"
