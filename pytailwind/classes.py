@@ -11,6 +11,10 @@ CLASSES = {
                 "baseline": "baseline",
                 "stretch": "stretch",
             },
+            "appearance": {
+                "none": "none",
+                "auto": "auto",
+            },
             "justifyContent": {
                 "start": "flex-start",
                 "end": "flex-end",
@@ -38,15 +42,19 @@ CLASSES = {
                 "hidden": "hidden",
                 "none": "none",
             },
+            "borderCollapse": {
+                "collapse": "collapse",
+                "separate": "separate",
+            },
             "top": SPACING,
             "right": SPACING,
             "bottom": SPACING,
             "left": SPACING,
             "animationNames": {
                 "none": 'none',
-                "spin": 'spin 1s linear var(--tw-animation-count, infinite)',
+                "spin": 'var(--animate-spin)',
                 "ping": 'ping 1s cubic-bezier(0, 0, 0.2, 1) var(--tw-animation-count, infinite)',
-                "pulse": 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) var(--tw-animation-count, infinite)',
+                "pulse": 'var(--animate-pulse)',
                 "bounce": 'bounce 1s var(--tw-animation-count, infinite)',
             },
             # "animationDuration": {
@@ -207,6 +215,9 @@ CLASSES = {
                 'right-top': 'right top',
                 "top": 'top',
             },
+            "container": {
+                 "DEFAULT": [{"width": "100%"}],
+            },
             "backgroundSize": {
                 "auto": 'auto',
                 "cover": 'cover',
@@ -222,12 +233,12 @@ CLASSES = {
                 "none": '0px',
                 "sm": '0.125rem',
                 "DEFAULT": '0.25rem',
-                "md": '0.375rem',
-                "lg": '0.5rem',
-                "xl": '0.75rem',
+                "md": 'var(--radius-md)',
+                "lg": 'var(--radius-lg)',
+                "xl": 'var(--radius-xl)',
                 '2xl': '1rem',
                 '3xl': '1.5rem',
-                "full": '9999px',
+                "full": 'calc(infinity * 1px)',
             },
             "borderWidth": {
                 "DEFAULT": '1px',
@@ -605,9 +616,9 @@ CLASSES = {
                 "extralight": '200',
                 "light": '300',
                 "normal": '400',
-                "medium": '500',
-                "semibold": '600',
-                "bold": '700',
+                "medium": [{"--tw-font-weight": "var(--font-weight-medium)"}, {"font-weight": "var(--font-weight-medium)"}],
+                "semibold": [{"--tw-font-weight": "var(--font-weight-semibold)"}, {"font-weight": "var(--font-weight-semibold)"}],
+                "bold": [{"--tw-font-weight": "var(--font-weight-bold)"}, {"font-weight": "var(--font-weight-bold)"}],
                 "extrabold": '800',
                 "black": '900',
             },
@@ -1054,6 +1065,10 @@ CLASSES = {
                 'fixed': 'fixed',
                 'sticky': 'sticky'
             },
+            "pointerEvents": {
+                "none": "none",
+                "auto": "auto",
+            },
             "ringColor": {
                 "DEFAULT": '#3b82f6'  # theme('colors.blue.500', '#3b82f6'),
             },
@@ -1077,6 +1092,12 @@ CLASSES = {
     },
     "insetRing": {
         "DEFAULT": "inset 0 0 0 1px",
+    },
+    "resize": {
+        "none": "none",
+        "y": "vertical",
+        "x": "horizontal",
+        "DEFAULT": "both",
     },
             "rotate": {
                 "0": '0deg',
@@ -1267,9 +1288,13 @@ CLASSES = {
             "transitionTimingFunction": {
                 "DEFAULT": 'cubic-bezier(0.4, 0, 0.2, 1)',
                 "linear": 'linear',
-                "in": 'cubic-bezier(0.4, 0, 1, 1)',
-                "out": 'cubic-bezier(0, 0, 0.2, 1)',
-                'in-out': 'cubic-bezier(0.4, 0, 0.2, 1)',
+                "in": 'var(--ease-in)',
+                "out": 'var(--ease-out)',
+                'in-out': 'var(--ease-in-out)',
+            },
+            "transform": {
+                "none": "none",
+                "DEFAULT": [{"transform": "translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"}],
             },
             "translate": {
                 '1/2': '50%',
@@ -1346,9 +1371,20 @@ CLASSES = {
                 "svw": '100svw',
                 "lvw": '100lvw',
                 "dvw": '100dvw',
-                "min": 'min-content',
                 "max": 'max-content',
                 "fit": 'fit-content',
+            },
+            "userSelect": {
+                "none": "none",
+                "text": "text",
+                "all": "all",
+                "auto": "auto",
+            },
+            "outlineStyle": {
+                "none": "2px solid transparent",
+                "dashed": "dashed",
+                "dotted": "dotted",
+                "double": "double",
             },
             "willChange": {
                 "auto": 'auto',
@@ -1520,8 +1556,6 @@ for i, j in [["m", "margin"], ["p", "padding"]]:
 MULTI_REQUIREMENT = {
     "marginLeftRight": ["marginRight"],
     "marginTopBottom": ["marginBottom"],
-    "paddingLeftRight": ["paddingRight"],
-    "paddingTopBottom": ["paddingBottom"],
     "rounded": ["borderTopLeftRadius", "borderTopRightRadius", "borderBottomRightRadius",
                 "borderBottomLeftRadius"],
     "roundedTop": ["borderTopLeftRadius", "borderTopRightRadius"],
@@ -1550,6 +1584,8 @@ CLASSES["whitespace"] = {
 CLASSES["truncate"] = {
     "DEFAULT": [{"overflow": "hidden"}, {"text-overflow": "ellipsis"}, {"white-space": "nowrap"}]
 }
+CLASSES["paddingLeftRight"] = SPACING.copy()
+CLASSES["paddingTopBottom"] = SPACING.copy()
 for i, j in MULTI_REQUIREMENT.items():
     CLASSES[i] = {}
     for key in CLASSES["margin"]:
